@@ -1,0 +1,81 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=1200,initial-scale=1">
+<title>Anhad — social card</title>
+<style>
+/* ============================================================================
+   OG CARD 1200x630 — the v1 language compressed to one frame.
+   Survives LinkedIn's ~360px feed render: wordmark + mark + one line.
+   ========================================================================== */
+/*FONT:Cabinet Grotesk*//*FONT:Zodiak*//*FONT:Fragment Mono*/
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0a0b0d; --chalk:#f0eee8; --lime:#c8ff2e; --blue:#4f7dff; --dim:#7c7f88;
+  --disp:'Cabinet Grotesk',Helvetica,Arial,sans-serif;
+  --ser:'Zodiak',Georgia,serif;
+  --mono:'Fragment Mono',ui-monospace,monospace;
+}
+html,body{width:1200px;height:630px;overflow:hidden}
+body{background:var(--ink);color:var(--chalk);position:relative;
+  font-family:var(--disp);-webkit-font-smoothing:antialiased}
+
+/* particle field, frozen mid-organization — the site's motif at rest */
+.field{position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(240,238,232,.22) 1px,transparent 1.2px);
+  background-size:26px 26px;
+  -webkit-mask-image:radial-gradient(120% 90% at 78% 46%,#000 0%,transparent 70%);
+  mask-image:radial-gradient(120% 90% at 78% 46%,#000 0%,transparent 70%)}
+.glow{position:absolute;width:760px;height:760px;right:-190px;top:-170px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,255,46,.13) 0%,transparent 62%)}
+
+/* the signature mark */
+.qm{position:absolute;right:78px;top:50%;transform:translateY(-52%);
+  font-family:var(--ser);font-style:italic;font-size:520px;line-height:.8;
+  color:var(--lime);opacity:.17;letter-spacing:-.04em}
+
+.pad{position:absolute;inset:0;padding:58px 64px;display:flex;flex-direction:column;
+  justify-content:space-between}
+
+.top{display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:14px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim)}
+.top b{color:var(--chalk);font-weight:400}
+.dotlive{display:inline-flex;align-items:center;gap:9px;color:var(--lime)}
+.dotlive i{width:9px;height:9px;border-radius:50%;background:var(--lime);display:block}
+
+h1{font-size:196px;line-height:.86;letter-spacing:-.045em;font-weight:800;
+  margin:0 0 4px;text-transform:uppercase}
+h1 span{color:var(--lime)}
+.line{font-family:var(--ser);font-size:38px;line-height:1.28;max-width:19ch;
+  color:#d7d5cf;letter-spacing:-.01em}
+.line em{color:var(--lime);font-style:italic}
+
+.facts{display:flex;gap:0;align-items:stretch;border-top:1px solid rgba(240,238,232,.15);
+  padding-top:20px;font-family:var(--mono)}
+.facts div{padding-right:34px;margin-right:34px;border-right:1px solid rgba(240,238,232,.13)}
+.facts div:last-child{border:0;margin:0;padding:0}
+.facts b{display:block;font-family:var(--disp);font-size:30px;font-weight:700;
+  letter-spacing:-.02em;color:var(--chalk);line-height:1}
+.facts s{display:block;text-decoration:none;font-size:12.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--dim);margin-top:7px}
+</style>
+
+<div class="field"></div><div class="glow"></div>
+<div class="qm">?</div>
+<div class="pad">
+  <div class="top">
+    <span>Product <b>&amp;</b> Design <b>·</b> Gurugram, India</span>
+    <span class="dotlive"><i></i> Open to work</span>
+  </div>
+
+  <div>
+    <h1>Anhad<span>.</span></h1>
+    <p class="line">Professional asker of <em>“wait, why?”</em></p>
+  </div>
+
+  <div class="facts">
+    <div><b>2+ yrs</b><s>product</s></div>
+    <div><b>+78%</b><s>YoY revenue</s></div>
+    <div><b>3</b><s>verification models</s></div>
+    <div><b>5</b><s>case studies</s></div>
+  </div>
+</div>
