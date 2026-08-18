@@ -1,0 +1,1146 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ANHAD.SYS — the signal room</title>
+<style>
+/* ============================================================================
+   V3 — THE SIGNAL ROOM
+   A phosphor CRT ops console. The only monitored system is Anhad.
+   Type: Martian Mono (all telemetry) · Khand (channel numerals)
+   Phosphor #3aff9e · Amber #ffb020 · near-black green ground
+   ========================================================================== */
+/*FONT:Martian Mono*//*FONT:Khand*/
+
+/* ---------- tokens ------------------------------------------------------- */
+:root{
+  --bg:#040906;          /* room dark */
+  --bg-1:#071009;        /* panel */
+  --bg-2:#0b1810;        /* raised panel */
+  --line:#143d26;        /* hairline */
+  --line-2:#1e5c39;      /* brighter rule */
+  --ph:#3aff9e;          /* phosphor signal */
+  --ph-hi:#8dffc7;       /* phosphor bright */
+  --txt:#a5d8ba;         /* body */
+  --dim:#639e7d;         /* secondary */
+  --faint:#578b6e;       /* tertiary labels — 4.6:1+ on every panel ground */
+  --amber:#ffb020;       /* warning / open-to-work */
+  --amber-dim:#8a5f14;
+  --red:#ff6a55;         /* sev high */
+  --glow:0 0 6px rgba(58,255,158,.55),0 0 24px rgba(58,255,158,.18);
+  --glow-amber:0 0 6px rgba(255,176,32,.5),0 0 20px rgba(255,176,32,.15);
+  --mono:'Martian Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --disp:'Khand','Arial Narrow',sans-serif;
+  /* 4px scale */
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:96px;
+  /* type ramp 1.25 on 13px mono base */
+  --t-xs:10px;--t-sm:11.5px;--t-base:13px;--t-md:16px;--t-lg:20px;--t-xl:25px;
+  --rad:2px;
+  --bar-h:44px;--cmd-h:52px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --fast:150ms;--med:320ms;--slow:640ms;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font:400 var(--t-base)/1.7 var(--mono);
+  padding:calc(var(--bar-h) + var(--s6)) var(--s5) calc(var(--cmd-h) + var(--s8));
+  overflow-x:hidden;
+  min-height:100vh;
+}
+::selection{background:var(--ph);color:var(--bg);text-shadow:none}
+:focus-visible{outline:2px solid var(--ph);outline-offset:3px;border-radius:1px}
+a{color:var(--ph);text-decoration:none}
+a:hover{color:var(--ph-hi);text-shadow:var(--glow)}
+
+/* ---------- CRT room overlays ------------------------------------------- */
+.crt-scan{position:fixed;inset:0;z-index:900;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px)}
+.crt-vig{position:fixed;inset:0;z-index:901;pointer-events:none;
+  background:radial-gradient(ellipse 120% 90% at 50% 45%,transparent 60%,rgba(0,0,0,.42) 100%)}
+.crt-trace{position:fixed;left:0;right:0;top:-140px;height:120px;z-index:902;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(58,255,158,.045) 55%,rgba(58,255,158,.09) 82%,transparent);
+  animation:trace 10s linear infinite}
+@keyframes trace{to{transform:translateY(calc(100vh + 280px))}}
+
+/* ---------- status bar --------------------------------------------------- */
+.statusbar{position:fixed;top:0;left:0;right:0;height:var(--bar-h);z-index:400;
+  background:rgba(4,9,6,.92);border-bottom:1px solid var(--line-2);
+  display:flex;align-items:stretch;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.statusbar::-webkit-scrollbar{display:none}
+.sb-cell{display:flex;align-items:center;gap:var(--s2);padding:0 var(--s4);
+  border-right:1px solid var(--line);white-space:nowrap;
+  font-size:var(--t-xs);letter-spacing:.08em;color:var(--dim)}
+.sb-cell b{font-weight:700;color:var(--ph);letter-spacing:.06em}
+.sb-sys{color:var(--ph);font-weight:700;text-shadow:var(--glow)}
+.sb-val{color:var(--txt);font-variant-numeric:tabular-nums}
+.sb-open{color:var(--amber);font-weight:700}
+.sb-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);
+  box-shadow:var(--glow-amber);animation:blink 1.6s steps(2,start) infinite;flex:none}
+.sb-dot--ph{background:var(--ph);box-shadow:var(--glow)}
+@keyframes blink{50%{opacity:.25}}
+.sb-gauge{display:inline-block;letter-spacing:-.05em;color:var(--ph)}
+.sb-spacer{flex:1;border-right:0}
+
+/* ---------- shared shell -------------------------------------------------- */
+.shell{max-width:1240px;margin:0 auto}
+.panel{background:var(--bg-1);border:1px solid var(--line);border-radius:var(--rad)}
+.panel-t{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s3);
+  border-bottom:1px solid var(--line);font-size:var(--t-xs);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint)}
+.panel-t::before{content:"";width:6px;height:6px;background:var(--ph);border-radius:50%;
+  box-shadow:var(--glow);flex:none}
+.panel-t .pt-r{margin-left:auto;color:var(--faint);letter-spacing:.1em}
+
+/* channel headers */
+.ch{margin:var(--s9) 0 var(--s6)}
+.ch-head{display:flex;align-items:flex-end;gap:var(--s4);border-bottom:1px solid var(--line-2);
+  padding-bottom:var(--s3);margin-bottom:var(--s6);flex-wrap:wrap}
+.ch-num{font:600 clamp(64px,9vw,118px)/0.8 var(--disp);color:transparent;
+  -webkit-text-stroke:1px var(--line-2);letter-spacing:.01em;flex:none;
+  transform:translateY(8px)}
+.ch-meta{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ch-tag{font-size:var(--t-xs);letter-spacing:.28em;color:var(--faint);text-transform:uppercase}
+.ch-title{font:600 clamp(28px,4vw,44px)/1 var(--disp);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ph);text-shadow:var(--glow)}
+.ch-sub{font-size:var(--t-sm);color:var(--dim);letter-spacing:.04em}
+.ch-line{flex:1;min-width:80px;display:flex;align-items:center;gap:var(--s2);
+  font-size:var(--t-xs);color:var(--faint);letter-spacing:.14em;justify-content:flex-end}
+.ch-line::before{content:"";flex:1;height:1px;background:var(--line);min-width:24px}
+
+/* reveal */
+.js .rv{opacity:0;transform:translateY(10px);
+  transition:opacity var(--slow) var(--ease),transform var(--slow) var(--ease);
+  transition-delay:var(--d,0ms)}
+.js .rv.on{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  .js .rv{opacity:1;transform:none;transition:none}
+  .crt-trace,.sb-dot,.radar-sweep,.blip,.cur,.dep-dot{animation:none !important}
+}
+
+/* ---------- CH/01 IDENT --------------------------------------------------- */
+.ident{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:var(--s6);
+  align-items:stretch;margin-top:var(--s5)}
+.id-main{display:flex;flex-direction:column;gap:var(--s4);min-width:0}
+.id-crumb{font-size:var(--t-xs);letter-spacing:.22em;color:var(--faint);text-transform:uppercase}
+.id-crumb b{color:var(--amber);font-weight:700}
+h1{font:700 clamp(72px,13vw,176px)/.82 var(--disp);letter-spacing:.015em;
+  text-transform:uppercase;color:var(--ph);text-shadow:var(--glow);margin-left:-4px}
+.id-role{display:flex;flex-wrap:wrap;gap:var(--s2);font-size:var(--t-xs);
+  letter-spacing:.1em;text-transform:uppercase}
+.id-role span{border:1px solid var(--line-2);padding:5px 10px;color:var(--txt)}
+.id-role span.amber{border-color:var(--amber-dim);color:var(--amber)}
+.id-type{font-size:var(--t-md);line-height:1.65;color:var(--txt);max-width:56ch;min-height:2.6em}
+.id-type .cur{display:inline-block;width:.6em;height:1.05em;background:var(--ph);
+  vertical-align:-.15em;margin-left:2px;animation:blink 1s steps(2,start) infinite;
+  box-shadow:var(--glow)}
+.id-sub{font-size:var(--t-sm);color:var(--dim);max-width:60ch}
+.id-cta{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s2)}
+.btn{display:inline-flex;align-items:center;gap:var(--s2);padding:12px 18px;
+  font:700 var(--t-sm)/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--ph);color:var(--ph);background:transparent;cursor:pointer;
+  border-radius:var(--rad);transition:background var(--fast) var(--ease),color var(--fast) var(--ease),
+  box-shadow var(--fast) var(--ease),transform var(--fast) var(--ease)}
+.btn:hover{background:var(--ph);color:var(--bg);box-shadow:var(--glow);text-shadow:none}
+.btn:active{transform:translateY(1px)}
+.btn--amber{border-color:var(--amber);color:var(--amber)}
+.btn--amber:hover{background:var(--amber);color:var(--bg);box-shadow:var(--glow-amber)}
+.btn--ghost{border-color:var(--line-2);color:var(--dim)}
+.btn--ghost:hover{background:var(--bg-2);color:var(--ph);box-shadow:none;border-color:var(--ph)}
+.id-try{font-size:var(--t-xs);color:var(--faint);letter-spacing:.06em;margin-top:var(--s2)}
+.id-try button{font:inherit;color:var(--ph);background:none;border:0;border-bottom:1px dashed var(--line-2);
+  cursor:pointer;padding:2px 1px;letter-spacing:.06em}
+.id-try button:hover{color:var(--ph-hi);border-bottom-color:var(--ph);text-shadow:var(--glow)}
+
+/* radar */
+.radar{display:flex;flex-direction:column}
+.radar-scope{position:relative;flex:1;display:flex;align-items:center;justify-content:center;
+  padding:var(--s4);min-height:300px}
+.radar-scope svg{width:100%;max-width:330px;height:auto;display:block}
+.radar-sweep{transform-origin:130px 130px;animation:sweep 5.5s linear infinite}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.blip{animation:blip 2.4s ease-out infinite}
+.blip:nth-of-type(2){animation-delay:.9s}
+.blip:nth-of-type(3){animation-delay:1.7s}
+@keyframes blip{0%{opacity:1}70%{opacity:.25}100%{opacity:1}}
+.radar-foot{border-top:1px solid var(--line);padding:var(--s2) var(--s3);
+  font-size:var(--t-xs);color:var(--faint);letter-spacing:.1em;display:flex;
+  justify-content:space-between;gap:var(--s3);flex-wrap:wrap}
+.radar-foot b{color:var(--ph);font-weight:700}
+
+/* stat readouts */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-top:var(--s6)}
+.stat{background:var(--bg-1);padding:var(--s4) var(--s4) var(--s3);display:flex;
+  flex-direction:column;gap:2px;min-width:0}
+.stat b{font:600 clamp(26px,3vw,38px)/1 var(--disp);color:var(--ph-hi);
+  letter-spacing:.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat span{font-size:var(--t-xs);color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+.stat i{font-style:normal;font-size:var(--t-xs);color:var(--faint)}
+
+/* ---------- CH/02 SYSLOG -------------------------------------------------- */
+.syslog{padding:var(--s4) 0}
+.log{list-style:none}
+.log li{display:grid;grid-template-columns:200px 64px minmax(0,1fr);gap:var(--s4);
+  padding:var(--s4) var(--s4);border-bottom:1px dashed var(--line);align-items:start}
+.log li:last-child{border-bottom:0}
+.log time{font-size:var(--t-xs);color:var(--faint);letter-spacing:.06em;
+  font-variant-numeric:tabular-nums;padding-top:3px;white-space:nowrap}
+.log .lv{font-size:var(--t-xs);font-weight:700;letter-spacing:.1em;padding-top:3px}
+.lv--boot{color:var(--dim)}.lv--info{color:var(--ph)}.lv--scale{color:var(--ph-hi)}
+.lv--active{color:var(--ph);text-shadow:var(--glow)}.lv--listen{color:var(--amber)}
+.log h3{font:600 var(--t-md)/1.3 var(--mono);color:var(--txt);letter-spacing:.02em;margin-bottom:var(--s2)}
+.log h3 em{font-style:normal;color:var(--faint);font-weight:400;font-size:var(--t-sm)}
+.log p{font-size:var(--t-sm);color:var(--dim);max-width:72ch}
+.log p b{color:var(--ph);font-weight:700}
+.log p .am{color:var(--amber)}
+.log .tail{color:var(--faint);font-size:var(--t-xs);margin-top:var(--s2);letter-spacing:.06em}
+
+/* ---------- CH/03 DEPLOYMENTS --------------------------------------------- */
+.deps{display:flex;flex-direction:column;gap:var(--s4)}
+.dep{border:1px solid var(--line-2);background:var(--bg-1);border-radius:var(--rad)}
+.dep summary{list-style:none;cursor:pointer;padding:var(--s4);display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;gap:var(--s4);align-items:center;
+  transition:background var(--fast) var(--ease)}
+.dep summary::-webkit-details-marker{display:none}
+.dep summary:hover{background:var(--bg-2)}
+.dep-dot{width:10px;height:10px;border-radius:50%;background:var(--ph);
+  box-shadow:var(--glow);animation:blink 2.2s steps(2,start) infinite}
+.dep-id{min-width:0}
+.dep-id h3{font:600 var(--t-lg)/1.15 var(--mono);letter-spacing:.04em;color:var(--ph);
+  display:flex;flex-wrap:wrap;gap:var(--s2);align-items:baseline}
+.dep-id h3 small{font-size:var(--t-xs);font-weight:400;color:var(--faint);letter-spacing:.14em}
+.dep-id p{font-size:var(--t-sm);color:var(--dim);margin-top:2px}
+.dep-flags{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.flag{font-size:var(--t-xs);font-weight:700;letter-spacing:.12em;padding:4px 8px;
+  border:1px solid var(--line-2);color:var(--ph)}
+.flag--amber{border-color:var(--amber-dim);color:var(--amber)}
+.dep-open{font-size:var(--t-xs);color:var(--faint);letter-spacing:.1em;white-space:nowrap}
+.dep-open::before{content:"▸ ";color:var(--ph)}
+.dep[open] .dep-open::before{content:"▾ "}
+.dep-sheet{border-top:1px solid var(--line);padding:var(--s5) var(--s4) var(--s5)}
+@keyframes sheetin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.dep[open] .dep-sheet{animation:sheetin var(--med) var(--ease)}
+@media(prefers-reduced-motion:reduce){.dep[open] .dep-sheet{animation:none}}
+.sheet-grid{display:grid;grid-template-columns:110px minmax(0,1fr);gap:var(--s3) var(--s4)}
+.sheet-grid dt{font-size:var(--t-xs);font-weight:700;letter-spacing:.16em;color:var(--faint);
+  text-transform:uppercase;padding-top:2px}
+.sheet-grid dd{font-size:var(--t-sm);color:var(--txt);max-width:76ch}
+.sheet-grid dd b{color:var(--ph);font-weight:700}
+.sheet-grid dd .q{color:var(--amber)}
+.sheet-note{margin-top:var(--s4);padding-top:var(--s3);border-top:1px dashed var(--line);
+  font-size:var(--t-xs);color:var(--faint);letter-spacing:.06em}
+
+/* public case files */
+.cases{margin-top:var(--s5)}
+.case{display:grid;grid-template-columns:96px minmax(0,1.15fr) minmax(0,1.6fr) auto;gap:var(--s4);
+  align-items:center;padding:var(--s4);border-bottom:1px dashed var(--line)}
+.case:last-child{border-bottom:0}
+.case .cid{font-size:var(--t-xs);color:var(--faint);letter-spacing:.1em}
+.case h3{font:600 var(--t-md)/1.3 var(--mono);color:var(--txt)}
+.case h3 small{display:block;font-size:var(--t-xs);font-weight:400;color:var(--faint);letter-spacing:.1em}
+.case p{font-size:var(--t-sm);color:var(--dim)}
+.case p b{color:var(--ph);font-weight:700}
+.case-link{font-size:var(--t-xs);font-weight:700;letter-spacing:.12em;border:1px solid var(--line-2);
+  padding:9px 12px;white-space:nowrap;transition:all var(--fast) var(--ease)}
+.case-link:hover{border-color:var(--ph);background:var(--bg-2);text-shadow:var(--glow)}
+.case--locked h3,.case--locked p{color:var(--faint)}
+.case--locked .case-link{border-color:var(--amber-dim);color:var(--amber)}
+.case--locked .case-link:hover{border-color:var(--amber);text-shadow:var(--glow-amber)}
+
+/* ---------- CH/04 SUBSYSTEMS ---------------------------------------------- */
+.svc{list-style:none}
+.svc li{display:grid;grid-template-columns:180px 84px minmax(0,1fr);gap:var(--s4);
+  padding:var(--s3) var(--s4);border-bottom:1px dashed var(--line);align-items:baseline}
+.svc li:last-child{border-bottom:0}
+.svc .sname{font-weight:700;letter-spacing:.08em;color:var(--txt);font-size:var(--t-sm)}
+.svc .sstat{font-size:var(--t-xs);font-weight:700;letter-spacing:.1em;color:var(--ph)}
+.svc .sstat::before{content:"[ "}.svc .sstat::after{content:" ]"}
+.svc .sdesc{font-size:var(--t-sm);color:var(--dim)}
+
+/* ---------- AUX/VID VISUAL OUTPUT ----------------------------------------- */
+.wall{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4)}
+.crt{background:var(--bg-2);border:1px solid var(--line-2);border-radius:4px;
+  padding:var(--s2);display:flex;flex-direction:column;gap:var(--s2);
+  transition:transform var(--fast) var(--ease),box-shadow var(--fast) var(--ease),border-color var(--fast) var(--ease)}
+.crt:hover{transform:translateY(-3px);border-color:var(--ph);box-shadow:0 0 0 1px rgba(58,255,158,.25),0 12px 32px rgba(0,0,0,.5)}
+.crt-screen{position:relative;overflow:hidden;border:1px solid #000;background:#000;border-radius:2px}
+.crt-screen img{width:100%;height:auto;display:block;filter:saturate(.92) contrast(1.02)}
+.crt-screen::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px),
+  radial-gradient(ellipse 130% 100% at 50% 40%,transparent 62%,rgba(0,20,10,.4) 100%)}
+.crt-plate{display:flex;align-items:center;gap:var(--s2);padding:2px 4px 4px}
+.crt-led{width:6px;height:6px;border-radius:50%;background:var(--ph);box-shadow:var(--glow);flex:none}
+.crt-plate figcaption{font-size:var(--t-xs);color:var(--dim);letter-spacing:.1em;min-width:0}
+.crt-plate figcaption b{color:var(--ph);font-weight:700;letter-spacing:.14em}
+.crt--wide{grid-column:span 2}
+.wall-foot{margin-top:var(--s5);display:flex;flex-wrap:wrap;gap:var(--s4);align-items:center;
+  justify-content:space-between;font-size:var(--t-sm);color:var(--dim)}
+
+/* ---------- CH/05 DIAGNOSTICS --------------------------------------------- */
+.diag{list-style:none}
+.diag li{display:grid;grid-template-columns:110px 92px minmax(0,1fr) 150px;gap:var(--s4);
+  padding:var(--s4);border-bottom:1px dashed var(--line);align-items:baseline}
+.diag li:last-child{border-bottom:0}
+.diag .did{font-size:var(--t-xs);color:var(--faint);letter-spacing:.08em}
+.sev{font-size:var(--t-xs);font-weight:700;letter-spacing:.1em}
+.sev--info{color:var(--dim)}.sev--low{color:var(--ph)}.sev--med{color:var(--amber)}.sev--high{color:var(--red)}
+.diag h3{font:400 var(--t-sm)/1.6 var(--mono);color:var(--txt)}
+.diag h3 small{display:block;color:var(--faint);font-size:var(--t-xs);margin-top:2px}
+.diag .dst{font-size:var(--t-xs);font-weight:700;letter-spacing:.1em;color:var(--amber);text-align:right}
+.diag .dst.ok{color:var(--ph)}
+
+/* ---------- CH/06 UPLINK --------------------------------------------------- */
+.uplink{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:var(--s4)}
+.up-main{padding:var(--s6) var(--s5);display:flex;flex-direction:column;gap:var(--s4)}
+.up-main .big{font:600 clamp(30px,4.6vw,54px)/1.02 var(--disp);letter-spacing:.04em;
+  text-transform:uppercase;color:var(--ph);text-shadow:var(--glow);max-width:14ch}
+.up-main .big .am{color:var(--amber);text-shadow:var(--glow-amber)}
+.up-note{font-size:var(--t-sm);color:var(--dim);max-width:52ch}
+.up-links{display:flex;flex-direction:column;border-top:1px solid var(--line);margin-top:var(--s2)}
+.up-link{display:grid;grid-template-columns:130px minmax(0,1fr) auto;gap:var(--s3);align-items:center;
+  padding:var(--s3) var(--s2);border-bottom:1px solid var(--line);color:var(--txt);
+  transition:background var(--fast) var(--ease),padding-left var(--fast) var(--ease)}
+.up-link:hover{background:var(--bg-2);padding-left:var(--s3);text-shadow:none}
+.up-link .ul-k{font-size:var(--t-xs);font-weight:700;letter-spacing:.16em;color:var(--faint)}
+.up-link .ul-v{font-size:var(--t-sm);color:var(--ph);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.up-link:hover .ul-v{color:var(--ph-hi);text-shadow:var(--glow)}
+.up-link .ul-a{font-size:var(--t-xs);color:var(--faint);letter-spacing:.1em;white-space:nowrap}
+.record{display:flex;flex-direction:column}
+.rec-body{padding:var(--s4);display:flex;flex-direction:column;gap:var(--s4);flex:1}
+.rec-g h4{font-size:var(--t-xs);letter-spacing:.2em;color:var(--faint);text-transform:uppercase;
+  margin-bottom:var(--s2)}
+.rec-g ul{list-style:none}
+.rec-g li{font-size:var(--t-sm);color:var(--txt);padding:5px 0;border-bottom:1px dashed var(--line);
+  display:flex;gap:var(--s3);justify-content:space-between;flex-wrap:wrap}
+.rec-g li:last-child{border-bottom:0}
+.rec-g li span{color:var(--faint);font-size:var(--t-xs);letter-spacing:.08em}
+.rec-g li b{font-weight:400}
+.rec-note{font-size:var(--t-xs);color:var(--dim)}
+.rec-note b{color:var(--ph);font-weight:700}
+.rec-end{margin-top:auto;padding-top:var(--s4);border-top:1px dashed var(--line);
+  font-size:var(--t-xs);color:var(--faint);letter-spacing:.14em;display:flex;
+  justify-content:space-between;gap:var(--s3);flex-wrap:wrap}
+.rec-end b{color:var(--ph);font-weight:700;letter-spacing:.14em}
+
+/* footer */
+.foot{margin-top:var(--s9);border-top:1px solid var(--line);padding-top:var(--s4);
+  display:flex;flex-wrap:wrap;gap:var(--s3) var(--s5);justify-content:space-between;
+  font-size:var(--t-xs);color:var(--faint);letter-spacing:.08em}
+.foot a{color:var(--dim)}
+.foot a:hover{color:var(--ph)}
+
+/* ---------- command line --------------------------------------------------- */
+.cmdwrap{position:fixed;left:0;right:0;bottom:0;z-index:500}
+.cmdout{position:absolute;bottom:100%;left:0;right:0;max-height:46vh;overflow-y:auto;
+  background:rgba(4,10,7,.97);border-top:1px solid var(--line-2);
+  padding:var(--s4) var(--s5) var(--s3);font-size:var(--t-sm)}
+.cmdout[hidden]{display:none}
+.co-line{white-space:pre-wrap;word-break:break-word;color:var(--txt);padding:1px 0}
+.co-line.in{color:var(--ph);font-weight:700}
+.co-line.dim{color:var(--dim)}
+.co-line.am{color:var(--amber)}
+.co-line a{border-bottom:1px dashed var(--line-2)}
+.co-close{position:sticky;top:0;float:right;font:700 var(--t-xs)/1 var(--mono);
+  letter-spacing:.1em;color:var(--faint);background:var(--bg-1);border:1px solid var(--line);
+  padding:6px 10px;cursor:pointer;margin-left:var(--s3)}
+.co-close:hover{color:var(--amber);border-color:var(--amber-dim)}
+.cmdbar{display:flex;align-items:center;gap:var(--s3);height:var(--cmd-h);
+  background:rgba(4,9,6,.95);border-top:1px solid var(--line-2);padding:0 var(--s5)}
+.cmd-prompt{color:var(--ph);font-weight:700;font-size:var(--t-sm);letter-spacing:.02em;
+  white-space:nowrap;text-shadow:var(--glow)}
+#cmdin{flex:1;min-width:0;background:transparent;border:0;color:var(--ph-hi);
+  font:400 var(--t-sm)/1 var(--mono);letter-spacing:.02em;caret-color:var(--ph);height:100%}
+#cmdin::placeholder{color:var(--faint)}
+#cmdin:focus{outline:none}
+.cmdbar:focus-within{border-top-color:var(--ph);box-shadow:0 -1px 12px rgba(58,255,158,.12)}
+.cmd-chips{display:flex;gap:var(--s2)}
+.chip{font:700 var(--t-xs)/1 var(--mono);letter-spacing:.08em;color:var(--dim);
+  border:1px solid var(--line);background:transparent;padding:7px 10px;cursor:pointer;
+  border-radius:var(--rad);transition:all var(--fast) var(--ease)}
+.chip:hover{color:var(--ph);border-color:var(--ph);text-shadow:var(--glow)}
+.chip:active{transform:translateY(1px)}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---------- responsive ----------------------------------------------------- */
+@media(max-width:1020px){
+  .wall{grid-template-columns:repeat(2,1fr)}
+  .ident{grid-template-columns:1fr}
+  .radar-scope{min-height:260px}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .case{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto}
+  .case .cid{grid-column:1/-1}
+  .case p{grid-column:1/-1}
+}
+@media(max-width:760px){
+  body{padding:calc(var(--bar-h) + var(--s5)) var(--s4) calc(var(--cmd-h) + var(--s7))}
+  /* recruiters must see OPEN_TO_WORK without scrolling the bar: slot it 2nd */
+  .sb-cell{order:2}
+  .statusbar .sb-cell:first-child{order:0}
+  .sb-cell--open{order:1}
+  .sb-spacer{order:3}
+  .ch{margin:var(--s8) 0 var(--s5)}
+  .ch-num{font-size:56px;transform:translateY(6px)}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .log li{grid-template-columns:1fr;gap:var(--s1);padding:var(--s4) var(--s2)}
+  .log time{padding:0}
+  .log .lv{padding:0}
+  .svc li{grid-template-columns:minmax(0,1fr) auto;row-gap:2px}
+  .svc .sdesc{grid-column:1/-1}
+  .diag li{grid-template-columns:minmax(0,1fr) auto}
+  .diag h3{grid-column:1/-1}
+  .diag .dst{text-align:left;grid-column:1/-1}
+  .uplink{grid-template-columns:1fr}
+  .sheet-grid{grid-template-columns:1fr;gap:var(--s1) 0}
+  .sheet-grid dd{margin-bottom:var(--s3)}
+  .up-link{grid-template-columns:minmax(0,1fr) auto}
+  .up-link .ul-k{grid-column:1/-1}
+  .dep summary{grid-template-columns:auto minmax(0,1fr)}
+  .dep-flags{grid-column:2;justify-content:flex-start}
+  .dep-open{grid-column:2}
+  .cmd-chips{display:none}
+  .cmdbar{padding:0 var(--s4)}
+  .cmdout{padding:var(--s4) var(--s4) var(--s3)}
+  .id-type{min-height:3.4em}
+  .wall{grid-template-columns:1fr 1fr;gap:var(--s3)}
+  .crt--wide{grid-column:1/-1}
+  h1{margin-left:-2px}
+}
+@media(max-width:430px){
+  .wall{grid-template-columns:1fr}
+  .crt--wide{grid-column:auto}
+}
+@media(pointer:coarse),(max-width:760px){
+  .btn{min-height:44px}
+  .chip,.co-close,.case-link,.id-try button{min-height:44px;min-width:44px;
+    display:inline-flex;align-items:center;justify-content:center}
+  .up-link{min-height:44px}
+  .cmdbar{height:56px}
+  :root{--cmd-h:56px}
+  /* inline text links: grow the hit area without moving the line box
+     (vertical padding on non-replaced inline elements paints/hits but doesn't relayout) */
+  .foot a,.log p a,.co-line a,.rec-note a{padding:17px 4px;margin:0 -4px}
+}
+</style>
+<noscript><style>.rv{opacity:1 !important;transform:none !important}.cmdwrap{display:none}</style></noscript>
+<script>
+document.documentElement.className='js';
+/* radar favicon, data-URI — also stops the browser's automatic /favicon.ico 404 */
+(function(){var l=document.createElement('link');l.rel='icon';
+l.href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23040906'/%3E%3Ccircle cx='8' cy='8' r='5' fill='none' stroke='%233aff9e' stroke-width='1.5'/%3E%3Ccircle cx='8' cy='8' r='1.6' fill='%233aff9e'/%3E%3C/svg%3E";
+document.head.appendChild(l);})();
+</script>
+
+<div class="crt-scan" aria-hidden="true"></div>
+<div class="crt-vig" aria-hidden="true"></div>
+<div class="crt-trace" aria-hidden="true"></div>
+
+<!-- ══════════ STATUS BAR ══════════ -->
+<header class="statusbar" aria-label="System telemetry">
+  <div class="sb-cell"><span class="sb-dot sb-dot--ph" aria-hidden="true"></span><span class="sb-sys">ANHAD.SYS</span><span>v3.0</span></div>
+  <div class="sb-cell">UPTIME <span class="sb-val" id="sb-uptime">—</span></div>
+  <div class="sb-cell">TABS_OPEN <span class="sb-val" id="sb-tabs">047</span></div>
+  <div class="sb-cell">CURIOSITY <span class="sb-gauge" aria-hidden="true">▮▮▮▮▮▮▮▮▮▯</span> <span class="sb-val">98%</span></div>
+  <div class="sb-cell">LOC <span class="sb-val">30.9°N 75.8°E · PUNJAB, IN</span></div>
+  <div class="sb-cell">IST <span class="sb-val" id="sb-clock">—</span></div>
+  <div class="sb-cell sb-spacer" aria-hidden="true"></div>
+  <div class="sb-cell sb-cell--open"><span class="sb-dot" aria-hidden="true"></span><span class="sb-open">OPEN_TO_WORK</span></div>
+</header>
+
+<main class="shell">
+
+<!-- ══════════ CH/01 IDENT ══════════ -->
+<section class="ch" id="ch01" aria-label="Channel 1: identity">
+  <div class="ch-head rv">
+    <span class="ch-num" aria-hidden="true">01</span>
+    <div class="ch-meta">
+      <span class="ch-tag">CH/01 · SUBJECT PROFILE</span>
+      <h2 class="ch-title">Ident</h2>
+      <span class="ch-sub">the system under observation</span>
+    </div>
+    <div class="ch-line">SIGNAL LOCKED</div>
+  </div>
+
+  <div class="ident">
+    <div class="id-main rv" style="--d:60ms">
+      <p class="id-crumb">SUBJECT DESIGNATION · STATUS <b>OPEN_TO_WORK</b> · AVAILABLE WORLDWIDE</p>
+      <h1>Anhad</h1>
+      <div class="id-role">
+        <span>PRODUCT MANAGER</span>
+        <span>DESIGNS THE INTERFACES HE SPECS</span>
+        <span class="amber">CERTIFIED AI-FIRST PM</span>
+      </div>
+      <p class="id-type"><span id="tagline">Making sense of chaos, one “wait, why?” at a time.</span><span class="cur" aria-hidden="true"></span></p>
+      <p class="id-sub">Product thinker by role, storyteller by instinct. The work sits somewhere
+      between logic, empathy and a few too many open tabs — the console above is not exaggerating.</p>
+      <div class="id-cta">
+        <a class="btn" href="#ch06">Establish uplink</a>
+        <a class="btn btn--amber" href="{{RESUME_HREF}}" download="Anhad-Resume.pdf">Exfil resume.pdf</a>
+      </div>
+      <p class="id-try">this console takes commands — try
+        <button type="button" data-cmd="help">help</button> ·
+        <button type="button" data-cmd="why">why</button> ·
+        <button type="button" data-cmd="ls work">ls work</button> ·
+        <button type="button" data-cmd="sudo hire">sudo hire</button>
+      </p>
+    </div>
+
+    <figure class="radar panel rv" style="--d:140ms">
+      <div class="panel-t">SCOPE · CONTACT TRACKING<span class="pt-r">RANGE 12,000 KM</span></div>
+      <div class="radar-scope">
+        <svg viewBox="0 0 260 260" role="img" aria-label="Radar scope showing three friendly contacts: Punjab home base, Toronto operations 2023 to 24, and worldwide availability">
+          <defs>
+            <linearGradient id="swp" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#3aff9e" stop-opacity=".5"/>
+              <stop offset="1" stop-color="#3aff9e" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <circle cx="130" cy="130" r="118" fill="none" stroke="#143d26"/>
+          <circle cx="130" cy="130" r="86" fill="none" stroke="#143d26"/>
+          <circle cx="130" cy="130" r="54" fill="none" stroke="#143d26"/>
+          <circle cx="130" cy="130" r="22" fill="none" stroke="#1e5c39"/>
+          <line x1="130" y1="12" x2="130" y2="248" stroke="#143d26"/>
+          <line x1="12" y1="130" x2="248" y2="130" stroke="#143d26"/>
+          <line x1="47" y1="47" x2="213" y2="213" stroke="#0d2919"/>
+          <line x1="213" y1="47" x2="47" y2="213" stroke="#0d2919"/>
+          <g class="radar-sweep">
+            <path d="M130 130 L130 12 A118 118 0 0 1 189 29 Z" fill="url(#swp)"/>
+            <line x1="130" y1="130" x2="130" y2="12" stroke="#3aff9e" stroke-opacity=".8"/>
+          </g>
+          <g class="blip"><circle cx="130" cy="130" r="4" fill="#3aff9e"/><circle cx="130" cy="130" r="8" fill="none" stroke="#3aff9e" stroke-opacity=".4"/></g>
+          <g class="blip"><circle cx="66" cy="78" r="3" fill="#3aff9e"/></g>
+          <g class="blip"><circle cx="186" cy="180" r="3" fill="#ffb020"/></g>
+          <text x="130" y="152" fill="#639e7d" font-size="8" font-family="Martian Mono,monospace" text-anchor="middle" letter-spacing="1">PUNJAB·HQ</text>
+          <text x="66" y="68" fill="#578b6e" font-size="7" font-family="Martian Mono,monospace" text-anchor="middle" letter-spacing="1">TORONTO 23-24</text>
+          <text x="186" y="196" fill="#cf9a2e" font-size="7" font-family="Martian Mono,monospace" text-anchor="middle" letter-spacing="1">NEXT·SIGNAL?</text>
+        </svg>
+      </div>
+      <figcaption class="radar-foot"><span>CONTACTS: <b>3</b> · ALL FRIENDLY</span><span>SWEEP 5.5s · NOMINAL</span></figcaption>
+    </figure>
+  </div>
+
+  <ul class="stats rv" style="--d:200ms" aria-label="Fast-scan readouts">
+    <li class="stat"><b>2+</b><span>yrs in product</span><i>and counting</i></li>
+    <li class="stat"><b>+78%</b><span>YoY revenue</span><i>zen den homes</i></li>
+    <li class="stat"><b>14→40+</b><span>listings scaled</span><i>same team</i></li>
+    <li class="stat"><b>3</b><span>verification models shipped</span><i>jaano · in prod</i></li>
+    <li class="stat"><b>60%</b><span>faster resolution</span><i>via SOPs he wrote</i></li>
+    <li class="stat"><b>5</b><span>public case studies</span><i>see CH/03</i></li>
+  </ul>
+</section>
+
+<!-- ══════════ CH/02 SYSLOG ══════════ -->
+<section class="ch" id="ch02" aria-label="Channel 2: career log">
+  <div class="ch-head rv">
+    <span class="ch-num" aria-hidden="true">02</span>
+    <div class="ch-meta">
+      <span class="ch-tag">CH/02 · EVENT STREAM</span>
+      <h2 class="ch-title">Syslog</h2>
+      <span class="ch-sub">career events, chronological, unedited</span>
+    </div>
+    <div class="ch-line">TAIL -f /VAR/LOG/ANHAD</div>
+  </div>
+
+  <div class="panel syslog">
+    <ol class="log">
+      <li class="rv">
+        <time datetime="1999">[199X-XX-XX --:--:--]</time><span class="lv lv--boot">BOOT</span>
+        <div>
+          <h3>origin.punjab <em>— first boot</em></h3>
+          <p>Subject boots in Punjab. Early firmware behaviour: takes apart radios, remotes
+          and door latches to see why they work. Reassembly rate: partial. The curiosity
+          daemon installs itself at startup and has never been successfully killed.</p>
+        </div>
+      </li>
+      <li class="rv" style="--d:80ms">
+        <time datetime="2023-01">[2023-01 → 2024-02]</time><span class="lv lv--info">INFO</span>
+        <div>
+          <h3>quesada.canada <em>— operations manager</em></h3>
+          <p>New country, new market, new playbook. Brand strategy alongside executive
+          leadership; rebuilt the CX processes end to end — customer-satisfaction
+          indicators <b>+20%</b>. A cron job of his own making: monthly market research
+          and competitive benchmarking, never skipped.</p>
+          <p class="tail">exit 0 · process handed over clean</p>
+        </div>
+      </li>
+      <li class="rv" style="--d:160ms">
+        <time datetime="2024-02">[2024-02 → 2026-05]</time><span class="lv lv--scale">SCALE</span>
+        <div>
+          <h3>zen-den-homes <em>— growth &amp; operations lead</em></h3>
+          <p>Luxury short-term rentals. Portfolio <b>14 → 40+ listings</b>; revenue
+          <b>+78% YoY</b>; occupancy <b>+30%</b> on dynamic pricing he tuned by hand.
+          Wrote the onboarding workflow and SOPs: ramp-up <b>30% faster</b>, issue
+          resolution <b>60% faster</b>. Turns out hospitality is just uptime for humans.</p>
+          <p class="tail">exit 0 · systems still running without him — the point</p>
+        </div>
+      </li>
+      <li class="rv" style="--d:240ms">
+        <time datetime="2026-05">[2026-05 → now&nbsp;&nbsp;&nbsp;]</time><span class="lv lv--active">ACTIVE</span>
+        <div>
+          <h3>blostem <em>— product (and design; nobody asked him to do both)</em></h3>
+          <p>B2B fintech infrastructure, Zerodha (Rainmatter)-backed. Owns product AND design
+          for two systems: <b>JAANO</b> — RBI-compliant Video KYC + Video Personal Discussion,
+          three verification models in production — and <b>VOICEBREW</b> — AI voice agents for
+          BFSI. Full alert details on <a href="#ch03">CH/03</a>.</p>
+          <p class="tail">process running · nice CPU priority</p>
+        </div>
+      </li>
+      <li class="rv" style="--d:320ms">
+        <time>[now&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]</time><span class="lv lv--listen">LISTEN</span>
+        <div>
+          <h3>port.open <em>— accepting connections</em></h3>
+          <p><span class="am">OPEN_TO_WORK</span> broadcast on all frequencies, worldwide.
+          Route your packet via <a href="#ch06">CH/06 UPLINK</a> — or just type
+          <b>hire</b> in the console below.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══════════ CH/03 DEPLOYMENTS ══════════ -->
+<section class="ch" id="ch03" aria-label="Channel 3: deployments and case files">
+  <div class="ch-head rv">
+    <span class="ch-num" aria-hidden="true">03</span>
+    <div class="ch-meta">
+      <span class="ch-tag">CH/03 · PRODUCTION SYSTEMS</span>
+      <h2 class="ch-title">Deployments</h2>
+      <span class="ch-sub">two live systems · five public case files</span>
+    </div>
+    <div class="ch-line">2 ACTIVE · 0 INCIDENTS</div>
+  </div>
+
+  <div class="deps">
+    <details class="dep rv" id="dep-jaano">
+      <summary>
+        <span class="dep-dot" aria-hidden="true"></span>
+        <span class="dep-id">
+          <h3>JAANO <small>DEPLOY-01 · VIDEO KYC + VIDEO PD PLATFORM</small></h3>
+          <p>RBI-compliant verification infrastructure. Day job. NDA — no external link; ask him about it.</p>
+        </span>
+        <span class="dep-flags">
+          <span class="flag">ACTIVE</span><span class="flag flag--amber">NDA</span>
+          <span class="dep-open">CONTRIBUTION SHEET</span>
+        </span>
+      </summary>
+      <div class="dep-sheet">
+        <dl class="sheet-grid">
+          <dt>Role</dt><dd><b>Product + design owner.</b> The specs and the screens come from the same desk.</dd>
+          <dt>Discovery</dt><dd>Ran discovery with auditors, underwriters, compliance and ops — the people
+            who live inside the tool eight hours a day, not just the people who sign for it.</dd>
+          <dt>Shipped</dt><dd>Defined, prioritized and shipped <b>three verification models</b>, all in
+            production: officer-led · self-serve · AI avatar-guided.</dd>
+          <dt>Designed</dt><dd>Customer journeys, plus the admin / agent / auditor consoles, plus the
+            <b>design system</b> all of them run on.</dd>
+          <dt>Reporting</dt><dd>Defined the reporting suite — <b>1 case report + 8 ops reports</b> —
+            shaped line-by-line with underwriter input.</dd>
+          <dt>Rules</dt><dd><span class="q">“AI signals advise, a human decides.”</span> No customer
+            dead-ends, ever. Tenant-configurable checklists, languages and journeys —
+            framing configurability as the product's lead USP was his call.</dd>
+          <dt>GTM</dt><dd>Positioning plus the buyer decks that took it to banks — every claim
+            verified line-by-line against production code before it went on a slide.</dd>
+        </dl>
+        <p class="sheet-note">NO PRODUCT SCREENSHOTS · NO CLIENT NAMES · THE NDA IS DOING ITS JOB</p>
+      </div>
+    </details>
+
+    <details class="dep rv" style="--d:80ms" id="dep-voicebrew">
+      <summary>
+        <span class="dep-dot" aria-hidden="true"></span>
+        <span class="dep-id">
+          <h3>VOICEBREW <small>DEPLOY-02 · AI VOICE AGENT PLATFORM</small></h3>
+          <p>Voice agents for BFSI operations. Day job. Same NDA, same rule.</p>
+        </span>
+        <span class="dep-flags">
+          <span class="flag">ACTIVE</span><span class="flag flag--amber">NDA</span>
+          <span class="dep-open">CONTRIBUTION SHEET</span>
+        </span>
+      </summary>
+      <div class="dep-sheet">
+        <dl class="sheet-grid">
+          <dt>Role</dt><dd><b>0-to-1 feature PM + designer.</b> Blank page to build-spec.</dd>
+          <dt>Shipped</dt><dd><b>Campaign scheduling + outcome-based sequencing</b> — event-gated
+            campaign journeys where the next call depends on what the last one learned.
+            Defined from scratch: problem framing, flows, build-spec.</dd>
+          <dt>Spec</dt><dd>Internal <b>control-plane spec</b>: telemetry, a metrics catalogue,
+            RBAC, SLOs and call replay — the unglamorous plumbing that makes ops trust a voice bot.</dd>
+          <dt>Clients</dt><dd>Custom BFSI voice workflows — <b>collections, card activation,
+            welcome + loan outreach</b> — each client's messy human process turned into
+            call flows and lead schemas.</dd>
+        </dl>
+        <p class="sheet-note">CLIENT NAMES REDACTED · YES, ALL OF THEM</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="panel cases rv" style="--d:120ms">
+    <div class="panel-t">PUBLIC CASE FILES · CLEARED FOR RELEASE<span class="pt-r">PDF · DRIVE</span></div>
+    <div class="case">
+      <span class="cid">CASE-03</span>
+      <h3>Playo<small>SPORTSTECH · GROWTH</small></h3>
+      <p>Growth strategy for a sports community app — ARPU pushed <b>₹300 → ₹1,000</b>.</p>
+      <a class="case-link" href="https://drive.google.com/file/d/1JMeBFKTOdE03ffiWhw7lwNVqb7325PWH/view" target="_blank" rel="noopener">OPEN FILE ↗</a>
+    </div>
+    <div class="case">
+      <span class="cid">CASE-04</span>
+      <h3>Threads 2.0<small>CREATOR ECOSYSTEM</small></h3>
+      <p>Creator ecosystem play against X — growth loops, <b>AARRR</b> instrumentation, OKRs.</p>
+      <a class="case-link" href="https://drive.google.com/file/d/1ARs6Fz1sjVx43HdwiOFeIplSYHQTDtc6/view" target="_blank" rel="noopener">OPEN FILE ↗</a>
+    </div>
+    <div class="case">
+      <span class="cid">CASE-05</span>
+      <h3>Prime Video<small>STREAMING · MONETISATION</small></h3>
+      <p>Tiered pricing, discovery overhaul and a <b>live sports</b> wedge.</p>
+      <a class="case-link" href="https://drive.google.com/file/d/1xpq2jjMSSIqSQMpE5x8HPBHC-MXn8afG/view" target="_blank" rel="noopener">OPEN FILE ↗</a>
+    </div>
+    <div class="case case--locked">
+      <span class="cid">CASE-06/07</span>
+      <h3>Zomato · NoBroker<small>IN PROVISIONING</small></h3>
+      <p>Two more case files compiling. Landing soon — request early copies by mail.</p>
+      <a class="case-link" href="mailto:anhadsb2@gmail.com?subject=Requesting%20the%20Zomato%20%2F%20NoBroker%20case%20files">REQUEST ACCESS</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CH/04 SUBSYSTEMS ══════════ -->
+<section class="ch" id="ch04" aria-label="Channel 4: toolkit">
+  <div class="ch-head rv">
+    <span class="ch-num" aria-hidden="true">04</span>
+    <div class="ch-meta">
+      <span class="ch-tag">CH/04 · SERVICE REGISTRY</span>
+      <h2 class="ch-title">Subsystems</h2>
+      <span class="ch-sub">daily-driver services · all green</span>
+    </div>
+    <div class="ch-line">8/8 HEALTHY</div>
+  </div>
+
+  <div class="panel rv">
+    <ul class="svc">
+      <li><span class="sname">figma.service</span><span class="sstat">OK</span>
+        <span class="sdesc">Where his specs stop being documents and start being screens.</span></li>
+      <li><span class="sname">sql.service</span><span class="sstat">OK</span>
+        <span class="sdesc">A language that makes databases spill their secrets.</span></li>
+      <li><span class="sname">mixpanel.service</span><span class="sstat">OK</span>
+        <span class="sdesc">Reports what users did, not what they promised to do.</span></li>
+      <li><span class="sname">ga.service</span><span class="sstat">OK</span>
+        <span class="sdesc">Google Analytics — the second witness. The stories should match.</span></li>
+      <li><span class="sname">jira.service</span><span class="sstat">OK</span>
+        <span class="sdesc">Where scope goes to be negotiated.</span></li>
+      <li><span class="sname">excel.service</span><span class="sstat">OK</span>
+        <span class="sdesc">The oldest product-analytics tool still in production. Undefeated.</span></li>
+      <li><span class="sname">claude-code.service</span><span class="sstat">OK</span>
+        <span class="sdesc">Pair programmer on the night shift. This room was built with it.</span></li>
+      <li><span class="sname">canva.service</span><span class="sstat">OK</span>
+        <span class="sdesc">For decks due in an hour. Nobody has to know.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ AUX/VID VISUAL OUTPUT ══════════ -->
+<section class="ch" id="chvid" aria-label="Auxiliary video channel: design work">
+  <div class="ch-head rv">
+    <span class="ch-num" aria-hidden="true">AUX</span>
+    <div class="ch-meta">
+      <span class="ch-tag">AUX/VID · MONITOR WALL</span>
+      <h2 class="ch-title">Visual output</h2>
+      <span class="ch-sub">pure design work — direction and build, both his</span>
+    </div>
+    <div class="ch-line">6 FEEDS LIVE</div>
+  </div>
+
+  <div class="wall">
+    <figure class="crt rv">
+      <div class="crt-screen"><img src="/*ASSET:maison-blanc.jpg*/" width="760" height="949" alt="Maison Blanc — luxury print-card design for a fintech brand collection"></div>
+      <div class="crt-plate"><span class="crt-led" aria-hidden="true"></span>
+        <figcaption><b>VID-01</b> MAISON BLANC · luxury print card, fintech collection</figcaption></div>
+    </figure>
+    <figure class="crt rv" style="--d:60ms">
+      <div class="crt-screen"><img src="/*ASSET:gff-card-1.jpg*/" width="760" height="1006" alt="Editorial dictionary-concept card from the same fintech collection"></div>
+      <div class="crt-plate"><span class="crt-led" aria-hidden="true"></span>
+        <figcaption><b>VID-02</b> THE DICTIONARY EDIT · editorial rendition</figcaption></div>
+    </figure>
+    <figure class="crt rv" style="--d:120ms">
+      <div class="crt-screen"><img src="/*ASSET:gff-card-2.jpg*/" width="760" height="1006" alt="Metal-card rendition from the fintech card collection"></div>
+      <div class="crt-plate"><span class="crt-led" aria-hidden="true"></span>
+        <figcaption><b>VID-03</b> METAL · same collection, heavier alloy</figcaption></div>
+    </figure>
+    <figure class="crt rv" style="--d:180ms">
+      <div class="crt-screen"><img src="/*ASSET:gff-card-3.jpg*/" width="760" height="1006" alt="Magazine-cover rendition from the fintech card collection"></div>
+      <div class="crt-plate"><span class="crt-led" aria-hidden="true"></span>
+        <figcaption><b>VID-04</b> COVER STORY · magazine-cover rendition</figcaption></div>
+    </figure>
+    <figure class="crt crt--wide rv" style="--d:240ms">
+      <div class="crt-screen"><img src="/*ASSET:deck-cover.jpg*/" width="760" height="427" alt="Sales-deck cover design"></div>
+      <div class="crt-plate"><span class="crt-led" aria-hidden="true"></span>
+        <figcaption><b>VID-05</b> DECK COVER · sales-deck opener</figcaption></div>
+    </figure>
+    <figure class="crt crt--wide rv" style="--d:300ms">
+      <div class="crt-screen"><img src="/*ASSET:gff-landing.jpg*/" width="760" height="541" alt="Product landing-page section, designed and hand-coded"></div>
+      <div class="crt-plate"><span class="crt-led" aria-hidden="true"></span>
+        <figcaption><b>VID-06</b> LANDING SECTION · designed, then hand-coded</figcaption></div>
+    </figure>
+  </div>
+
+  <div class="wall-foot rv">
+    <span>SOURCE: design direction + build by Anhad, end to end. No stock, no template.</span>
+    <a class="btn btn--ghost" href="https://anhad1409.github.io/jaano-gff-collection/" target="_blank" rel="noopener">See the full collection ↗</a>
+  </div>
+</section>
+
+<!-- ══════════ CH/05 DIAGNOSTICS ══════════ -->
+<section class="ch" id="ch05" aria-label="Channel 5: known issues">
+  <div class="ch-head rv">
+    <span class="ch-num" aria-hidden="true">05</span>
+    <div class="ch-meta">
+      <span class="ch-tag">CH/05 · KNOWN ISSUES</span>
+      <h2 class="ch-title">Diagnostics</h2>
+      <span class="ch-sub">long-standing behaviours · none scheduled for fix</span>
+    </div>
+    <div class="ch-line">4 OPEN · 0 FIXED</div>
+  </div>
+
+  <div class="panel rv">
+    <ul class="diag">
+      <li>
+        <span class="did">ISSUE-0001</span><span class="sev sev--low">SEV:LOW</span>
+        <h3>Redesigns your slides. Uninvited.<small>first observed: every deck he has ever been sent</small></h3>
+        <span class="dst">WONTFIX</span>
+      </li>
+      <li>
+        <span class="did">ISSUE-0002</span><span class="sev sev--info">SEV:INFO</span>
+        <h3>Answers “why” before “when”. Every time.<small>root cause: the roadmap is downstream of the reason</small></h3>
+        <span class="dst ok">BY DESIGN</span>
+      </li>
+      <li>
+        <span class="did">ISSUE-0003</span><span class="sev sev--med">SEV:MED</span>
+        <h3>Parses every queue, menu and form as a product wearing a disguise.<small>repro rate: 100% — observed at airports, banks and one wedding buffet</small></h3>
+        <span class="dst">CANNOT UNSEE</span>
+      </li>
+      <li>
+        <span class="did">ISSUE-0004</span><span class="sev sev--high">SEV:HIGH</span>
+        <h3>Tab count trending strictly upward. Subject files it under “parallel discovery”.<small>mitigation attempted: more RAM. issue persists.</small></h3>
+        <span class="dst">WONTFIX</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ CH/06 UPLINK ══════════ -->
+<section class="ch" id="ch06" aria-label="Channel 6: contact">
+  <div class="ch-head rv">
+    <span class="ch-num" aria-hidden="true">06</span>
+    <div class="ch-meta">
+      <span class="ch-tag">CH/06 · TRANSMIT</span>
+      <h2 class="ch-title">Uplink</h2>
+      <span class="ch-sub">all channels monitored · replies fast</span>
+    </div>
+    <div class="ch-line">HANDSHAKE READY</div>
+  </div>
+
+  <div class="uplink">
+    <div class="panel up-main rv">
+      <p class="big">The console is manned.<br><span class="am">Send the signal.</span></p>
+      <p class="up-note">Hiring, collaborating, or just curious why the KYC flow you used last
+      week felt slow — every packet gets a reply. Based in Punjab, deployable worldwide.</p>
+      <div class="up-links">
+        <a class="up-link" href="mailto:anhadsb2@gmail.com?subject=Establishing%20uplink">
+          <span class="ul-k">EMAIL</span><span class="ul-v">anhadsb2@gmail.com</span><span class="ul-a">TRANSMIT →</span></a>
+        <a class="up-link" href="https://www.linkedin.com/in/anhad-singh-180925183/" target="_blank" rel="noopener">
+          <span class="ul-k">LINKEDIN</span><span class="ul-v">/in/anhad-singh-180925183</span><span class="ul-a">OPEN ↗</span></a>
+        <a class="up-link" href="tel:+919115551310">
+          <span class="ul-k">VOICE</span><span class="ul-v">+91 91155 51310</span><span class="ul-a">DIAL →</span></a>
+        <a class="up-link" href="{{RESUME_HREF}}" download="Anhad-Resume.pdf">
+          <span class="ul-k">RESUME</span><span class="ul-v">Anhad-Resume.pdf</span><span class="ul-a">EXFIL ↓</span></a>
+      </div>
+      <p class="id-try">or, in the console: <button type="button" data-cmd="hire">hire</button> —
+        escalate with <button type="button" data-cmd="sudo hire">sudo hire</button></p>
+    </div>
+
+    <div class="panel record rv" style="--d:100ms">
+      <div class="panel-t">OPERATOR RECORD<span class="pt-r">VERIFIED</span></div>
+      <div class="rec-body">
+        <div class="rec-g">
+          <h4>Education</h4>
+          <ul><li><b>B.Com (Hons)</b><span>Chitkara University</span></li></ul>
+        </div>
+        <div class="rec-g">
+          <h4>Certifications</h4>
+          <ul>
+            <li><b>AI-First Product Management Launchpad</b><span>Airtribe</span></li>
+            <li><b>Product Analytics</b><span>The Product School</span></li>
+            <li><b>JIRA</b><span>Udemy</span></li>
+          </ul>
+        </div>
+        <div class="rec-g">
+          <h4>Language protocols</h4>
+          <ul>
+            <li><b>English · Hindi · Punjabi</b><span>3 ACTIVE</span></li>
+          </ul>
+          <p class="rec-note">Not trivia — he ships <b>multilingual products</b>; Jaano journeys run
+          in the languages its tenants configure.</p>
+        </div>
+        <p class="rec-end"><span>RECORD ENDS · NO REDACTIONS ABOVE THIS LINE</span><b>EOF</b></p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span>ANHAD.SYS v3.0 · hand-coded by the operator · no trackers on this frequency</span>
+    <span><a href="mailto:anhadsb2@gmail.com">anhadsb2@gmail.com</a> · <a href="tel:+919115551310">+91 91155 51310</a> · © 2026</span>
+  </footer>
+</main>
+
+<!-- ══════════ COMMAND LINE ══════════ -->
+<div class="cmdwrap" id="cmdwrap">
+  <div class="cmdout" id="cmdout" role="log" aria-live="polite" hidden>
+    <button class="co-close" id="coclose" type="button" aria-label="Close console output">CLOSE ×</button>
+    <div id="colines"></div>
+  </div>
+  <form class="cmdbar" id="cmdform">
+    <span class="cmd-prompt" aria-hidden="true">visitor@anhad.sys:~$</span>
+    <label class="sr" for="cmdin">Console command — type help for the list</label>
+    <input id="cmdin" name="cmd" autocomplete="off" autocapitalize="off" spellcheck="false"
+      placeholder="type 'help' — the console is real">
+    <div class="cmd-chips" aria-hidden="false">
+      <button class="chip" type="button" data-cmd="help">help</button>
+      <button class="chip" type="button" data-cmd="why">why</button>
+      <button class="chip" type="button" data-cmd="ls work">ls work</button>
+      <button class="chip" type="button" data-cmd="sudo hire">sudo hire</button>
+    </div>
+  </form>
+</div>
+
+<script>
+(function(){
+"use strict";
+var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+var $ = function(s,c){return (c||document).querySelector(s)};
+var $$ = function(s,c){return [].slice.call((c||document).querySelectorAll(s))};
+
+/* ---------- telemetry ---------- */
+var START = new Date(2023,0,9,9,0,0); // career start — quesada onboarding
+function pad(n,w){n=String(n);while(n.length<(w||2))n='0'+n;return n}
+function uptime(){
+  var ms = Date.now()-START.getTime();
+  var d = Math.floor(ms/86400000);
+  var y = Math.floor(d/365); d -= y*365;
+  var rem = ms%86400000;
+  var h = Math.floor(rem/3600000), m = Math.floor(rem%3600000/60000), s = Math.floor(rem%60000/1000);
+  return pad(y)+'y '+pad(d,3)+'d '+pad(h)+':'+pad(m)+':'+pad(s);
+}
+var sbUp = $('#sb-uptime'), sbClock = $('#sb-clock'), sbTabs = $('#sb-tabs');
+function tick(){
+  sbUp.textContent = uptime();
+  try{ sbClock.textContent = new Date().toLocaleTimeString('en-GB',{timeZone:'Asia/Kolkata',hour12:false}); }
+  catch(e){ sbClock.textContent = new Date().toLocaleTimeString('en-GB',{hour12:false}); }
+}
+tick(); setInterval(tick,1000);
+
+var tabs = 47;
+function bumpTabs(){
+  tabs += (Math.random()<.18) ? 3 : 1;              // occasional research burst
+  if(Math.random()<.06 && tabs>52){ tabs -= 2; }     // rare, futile cleanup
+  sbTabs.textContent = pad(tabs,3);
+  setTimeout(bumpTabs, 6000+Math.random()*7000);
+}
+setTimeout(bumpTabs, 7000);
+
+/* ---------- reveals ---------- */
+var rvs = $$('.rv');
+if('IntersectionObserver' in window && !RM){
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); } });
+  },{rootMargin:'0px 0px -8% 0px',threshold:.05});
+  rvs.forEach(function(el){ io.observe(el); });
+}else{
+  rvs.forEach(function(el){ el.classList.add('on'); });
+}
+
+/* ---------- typed tagline ---------- */
+var tl = $('#tagline');
+if(tl && !RM){
+  var full = tl.textContent;
+  tl.textContent = '';
+  var i = 0;
+  (function type(){
+    if(i <= full.length){ tl.textContent = full.slice(0,i); i++; setTimeout(type, i<4?260:26+Math.random()*40); }
+  })();
+}
+
+/* ---------- command line ---------- */
+var out = $('#cmdout'), lines = $('#colines'), input = $('#cmdin'),
+    form = $('#cmdform'), closeBtn = $('#coclose');
+var whyIdx = 0, sudoTried = false;
+var WHY = [
+  "Because “how” is easy. “Why” is where the product hides.",
+  "Because the metric moved, and somebody should ask what moved it.",
+  "Because every queue, menu and form is a product wearing a disguise.",
+  "wait, why? — correct. The recursion is the whole methodology."
+];
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function print(html, cls){
+  var d = document.createElement('div');
+  d.className = 'co-line' + (cls?' '+cls:'');
+  d.innerHTML = html;
+  lines.appendChild(d);
+}
+function show(){ out.hidden = false; out.scrollTop = out.scrollHeight; }
+/* pending typewriter queue — flushed before any new command so outputs never interleave */
+var pending = [];
+function flushPending(){
+  pending.forEach(function(p){ clearTimeout(p.t); print(p.l[0], p.l[1]); });
+  pending = [];
+  out.scrollTop = out.scrollHeight;
+}
+function respond(arr){
+  var delay = RM ? 0 : 90;
+  arr.forEach(function(l,i){
+    var p = {l:l};
+    p.t = setTimeout(function(){
+      var ix = pending.indexOf(p);
+      if(ix === -1) return;            // already flushed
+      pending.splice(ix,1);
+      print(l[0], l[1]);
+      out.scrollTop = out.scrollHeight;
+    }, delay*i);
+    pending.push(p);
+  });
+}
+function goto(id, openIt){
+  var el = document.getElementById(id);
+  if(!el) return;
+  if(openIt && el.tagName==='DETAILS') el.open = true;
+  el.scrollIntoView({behavior: RM?'auto':'smooth', block:'start'});
+}
+var CMDS = {
+  help: function(){ respond([
+    ["available commands:","dim"],
+    ["  help          this menu"],
+    ["  whoami        subject profile"],
+    ["  why           the standing question"],
+    ["  ls work       list deployments + case files"],
+    ["  open <name>   jump to jaano / voicebrew / playo / threads / prime"],
+    ["  uptime        career clock"],
+    ["  tabs          current tab situation"],
+    ["  contact       all uplink channels"],
+    ["  exfil         download resume.pdf"],
+    ["  hire          open a channel to the operator"],
+    ["  sudo hire     if you mean it"],
+    ["  clear         wipe the console"]
+  ]); },
+  whoami: function(){ respond([
+    ["anhad — product manager, punjab, india. designs the interfaces he specs."],
+    ["certified AI-first PM. status: OPEN_TO_WORK, available worldwide.","am"],
+    ["making sense of chaos, one “wait, why?” at a time.","dim"]
+  ]); },
+  why: function(){ respond([[WHY[whyIdx++ % WHY.length]]]); },
+  ls: function(arg){
+    if(arg && arg.indexOf('work')===-1){ return CMDS._unknown('ls '+arg); }
+    respond([
+      ["total 7","dim"],
+      ["drwx------  anhad  nda      jaano/            3 verification models · in prod"],
+      ["drwx------  anhad  nda      voicebrew/        campaigns + sequencing · 0-to-1"],
+      ["-rw-r--r--  anhad  public   playo.pdf         ARPU ₹300 → ₹1,000"],
+      ["-rw-r--r--  anhad  public   threads-2.0.pdf   growth loops · AARRR · OKRs"],
+      ["-rw-r--r--  anhad  public   prime-video.pdf   tiered pricing · live sports"],
+      ["-rw-------  anhad  soon     zomato.lock       provisioning"],
+      ["-rw-------  anhad  soon     nobroker.lock     provisioning"],
+      ["try: open jaano","dim"]
+    ]);
+  },
+  open: function(arg){
+    arg = (arg||'').toLowerCase();
+    if(arg.indexOf('jaano')>-1){ respond([["opening DEPLOY-01 alert detail…","dim"]]); goto('dep-jaano',true); }
+    else if(arg.indexOf('voice')>-1){ respond([["opening DEPLOY-02 alert detail…","dim"]]); goto('dep-voicebrew',true); }
+    else if(arg.indexOf('playo')>-1){ respond([["opening CASE-03 ↗","dim"]]); window.open('https://drive.google.com/file/d/1JMeBFKTOdE03ffiWhw7lwNVqb7325PWH/view','_blank','noopener'); }
+    else if(arg.indexOf('thread')>-1){ respond([["opening CASE-04 ↗","dim"]]); window.open('https://drive.google.com/file/d/1ARs6Fz1sjVx43HdwiOFeIplSYHQTDtc6/view','_blank','noopener'); }
+    else if(arg.indexOf('prime')>-1){ respond([["opening CASE-05 ↗","dim"]]); window.open('https://drive.google.com/file/d/1xpq2jjMSSIqSQMpE5x8HPBHC-MXn8afG/view','_blank','noopener'); }
+    else if(arg.indexOf('zomato')>-1 || arg.indexOf('nobroker')>-1){ respond([["file locked — still provisioning. request early access:","am"],["<a href='mailto:anhadsb2@gmail.com?subject=Requesting%20the%20Zomato%20%2F%20NoBroker%20case%20files'>mail anhadsb2@gmail.com</a>"]]); }
+    else respond([["open what? try: open jaano · open voicebrew · open playo","dim"]]);
+  },
+  uptime: function(){ respond([
+    ["career uptime: "+uptime()+" — counting from quesada, jan 2023."],
+    ["curiosity daemon uptime: since 199X. no restarts recorded.","dim"]
+  ]); },
+  tabs: function(){ respond([
+    ["TABS_OPEN: "+tabs+" and climbing."],
+    ["subject maintains this is “parallel discovery”. see ISSUE-0004.","dim"]
+  ]); },
+  contact: function(){ respond([
+    ["uplink channels:","dim"],
+    ["  email     <a href='mailto:anhadsb2@gmail.com?subject=Establishing%20uplink'>anhadsb2@gmail.com</a>"],
+    ["  linkedin  <a href='https://www.linkedin.com/in/anhad-singh-180925183/' target='_blank' rel='noopener'>/in/anhad-singh-180925183</a> ↗"],
+    ["  voice     <a href='tel:+919115551310'>+91 91155 51310</a>"],
+    ["  resume    type exfil — or the amber button in CH/01","am"]
+  ]); },
+  exfil: function(){
+    respond([["exfiltrating resume.pdf… channel clean. done.","am"]]);
+    var a = $('#resume-cmd-link'); if(a) a.click();
+  },
+  hire: function(){ respond([
+    ["opening channel to anhadsb2@gmail.com…"],
+    ["good call. he replies fast.","dim"]
+  ]); setTimeout(function(){ location.href='mailto:anhadsb2@gmail.com?subject=Establishing%20uplink'; }, RM?0:700); },
+  sudo: function(arg){
+    if((arg||'').trim().indexOf('hire')!==0){ return respond([["visitor is not in the sudoers file. this incident will be reported.","am"]]); }
+    respond([
+      ["[sudo] password for visitor: ********","dim"],
+      ["access check… root privileges confirmed.","dim"],
+      ["PERMISSION GRANTED. escalating straight to the operator.","am"],
+      ["(sudo hire skips the small talk. opening channel…)"]
+    ]);
+    setTimeout(function(){ location.href='mailto:anhadsb2@gmail.com?subject=sudo%20hire%20%E2%80%94%20permission%20granted'; }, RM?0:1500);
+  },
+  clear: function(){ lines.innerHTML=''; out.hidden = true; },
+  _unknown: function(c){ respond([
+    ["command not found: "+esc(c),"am"],
+    ["try “help”. asking “why” also works — on the console and on the human.","dim"]
+  ]); }
+};
+function run(raw){
+  var c = raw.trim();
+  if(!c) return;
+  flushPending();                       // finish any in-flight response instantly
+  show();
+  print('visitor@anhad.sys:~$ '+esc(c),'in');
+  var parts = c.split(/\s+/), head = parts[0].toLowerCase(), rest = parts.slice(1).join(' ');
+  if(head==='hire' && rest){ head='hire'; }
+  if(CMDS[head] && head.charAt(0)!=='_'){ CMDS[head](rest); }
+  else if(head==='resume'||head==='cv'){ CMDS.exfil(); }
+  else if(head==='wait'&&rest.indexOf('why')>-1){ CMDS.why(); }
+  else { CMDS._unknown(c); }
+  show();
+}
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  run(input.value); input.value='';
+});
+$$('[data-cmd]').forEach(function(b){
+  b.addEventListener('click', function(){
+    input.focus({preventScroll:true});
+    run(b.getAttribute('data-cmd'));
+  });
+});
+closeBtn.addEventListener('click', function(){ out.hidden = true; input.focus(); });
+/* smooth in-page anchors (JS, not CSS — keeps programmatic scrolls instant) */
+$$('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    var el = document.getElementById(a.getAttribute('href').slice(1));
+    if(!el) return;
+    e.preventDefault();
+    el.scrollIntoView({behavior: RM?'auto':'smooth', block:'start'});
+    history.replaceState(null,'',a.getAttribute('href'));
+  });
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape' && !out.hidden){ out.hidden = true; }
+  if(e.key==='/' && document.activeElement!==input){ e.preventDefault(); input.focus(); }
+});
+/* hidden resume anchor for the exfil command */
+var ra = document.createElement('a');
+ra.id='resume-cmd-link'; ra.href="{{RESUME_HREF}}"; ra.download='Anhad-Resume.pdf';
+ra.className='sr'; ra.tabIndex=-1; ra.setAttribute('aria-hidden','true');
+document.body.appendChild(ra);
+})();
+</script>

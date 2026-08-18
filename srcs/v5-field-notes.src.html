@@ -1,0 +1,979 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anhad — Field Notes, vol. 1</title>
+<meta name="description" content="The working notebook of Anhad — product manager who designs the interfaces he specs. The mess before the polished spec: expedition log, pinned specimens, kit, margin confessions.">
+<style>
+/*FONT:Caveat*/
+/*FONT:Ranade*/
+/*FONT:Courier Prime*/
+
+/* ------------------------------------------------------------------
+   FIELD NOTES — tokens
+------------------------------------------------------------------ */
+:root{
+  /* primitive */
+  --paper:#f6efdd; --paper-page:#f9f3e2; --paper-card:#fbf6e9; --paper-deep:#e9dfc4;
+  --ink:#2b2622; --ink-soft:#57504a; --ink-faint:rgba(43,38,34,.16);
+  --red:#c4372b; --blue:#2b4a9e; --hl:#ffe34d;
+  --tape:rgba(243,229,171,.62); --wire:#8d8474;
+  /* semantic */
+  --c-bg:var(--paper); --c-page:var(--paper-page); --c-body:var(--ink);
+  --c-note:var(--blue); --c-mark:var(--red); --c-quiet:var(--ink-soft);
+  --rule:rgba(43,74,158,.16); --rule-red:rgba(196,55,43,.28);
+  /* type */
+  --f-hand:"Caveat",cursive;
+  --f-body:"Ranade",ui-sans-serif,system-ui,sans-serif;
+  --f-type:"Courier Prime","Courier New",monospace;
+  --t-xs:12px; --t-s:14px; --t-b:16.5px; --t-m:19px; --t-note:23px; --t-l:30px;
+  /* space (4px scale) */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
+  /* motion */
+  --ease:cubic-bezier(.45,.05,.35,1); --d-fast:180ms; --d-med:420ms; --d-draw:900ms;
+  --bind-w:46px; --tabs-w:52px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-padding-top:20px}
+body{
+  background:var(--c-bg);
+  background-image:
+    radial-gradient(1100px 700px at 85% -8%, rgba(201,183,134,.28), transparent 60%),
+    radial-gradient(900px 650px at -12% 108%, rgba(201,183,134,.22), transparent 55%);
+  color:var(--c-body);
+  font:400 var(--t-b)/1.62 var(--f-body);
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--hl);color:var(--ink)}
+:focus-visible{outline:2px dashed var(--red);outline-offset:3px;border-radius:2px}
+a{color:var(--c-note);text-underline-offset:3px;text-decoration-thickness:1.5px}
+a:hover{color:var(--red)}
+a:active{opacity:.7}
+svg text{font-family:var(--f-hand)}
+
+.skip{position:absolute;left:-999px;top:8px;z-index:99;background:var(--hl);color:var(--ink);
+  padding:10px 16px;font:700 var(--t-s) var(--f-type)}
+.skip:focus-visible{left:60px}
+
+/* ------------------------------------------------------------------
+   Ring binding (fixed, left) + index tabs (fixed, right)
+------------------------------------------------------------------ */
+.binding{position:fixed;left:0;top:0;height:100%;width:var(--bind-w);z-index:5;pointer-events:none}
+.tabs{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:40;
+  display:flex;flex-direction:column;gap:6px}
+.tabs a{
+  writing-mode:vertical-rl;text-decoration:none;color:var(--ink);
+  font:700 11px/1 var(--f-type);letter-spacing:.16em;
+  padding:14px 9px 14px 7px;border:1px solid rgba(43,38,34,.28);border-right:none;
+  border-radius:7px 0 0 7px;box-shadow:-2px 2px 3px rgba(43,38,34,.14);
+  transform:translateX(7px);
+  transition:transform var(--d-fast) var(--ease), box-shadow var(--d-fast) var(--ease);
+}
+.tabs a:hover,.tabs a:focus-visible{transform:translateX(0);color:var(--ink)}
+.tabs a:active{transform:translateX(2px)}
+.tabs a[aria-current]{transform:translateX(0);box-shadow:-3px 3px 5px rgba(43,38,34,.2);font-weight:700}
+.tabs a[aria-current]::after{content:" ✓"}
+.tb1{background:#f0d9a3}.tb2{background:#e7c8bd}.tb3{background:#ccd8bf}
+.tb4{background:#c6d3e6}.tb5{background:#e2d0e0}.tb6{background:#efe2ad}
+
+/* ------------------------------------------------------------------
+   Pages
+------------------------------------------------------------------ */
+.clip{overflow-x:hidden}
+main{padding:var(--s7) calc(var(--tabs-w) + 10px) 120px calc(var(--bind-w) + 14px)}
+.page{
+  position:relative;max-width:920px;margin:0 auto var(--s8);
+  background:var(--c-page);border:1px solid rgba(43,38,34,.14);
+  box-shadow:
+    0 1px 2px rgba(43,38,34,.10), 0 8px 26px rgba(43,38,34,.10),
+    3px 3px 0 rgba(43,38,34,.05), 6px 6px 0 rgba(43,38,34,.035);
+  padding:clamp(22px,4.5vw,58px) clamp(18px,5vw,64px) clamp(30px,5vw,56px);
+}
+.page.flip{animation:pageflip .55s var(--ease)}
+@keyframes pageflip{
+  0%{transform:perspective(1400px) rotateX(5deg);box-shadow:0 24px 50px rgba(43,38,34,.22)}
+  100%{transform:none}
+}
+.pg-ruled{background-image:
+  linear-gradient(90deg, transparent 0 44px, var(--rule-red) 44px 45px, transparent 45px);
+}
+.pg-ruled .rulepad{background-image:
+  repeating-linear-gradient(180deg, transparent 0 31px, var(--rule) 31px 32px)}
+.pg-dots{background-image:radial-gradient(rgba(43,38,34,.13) 1px, transparent 1.4px);
+  background-size:22px 22px}
+.pghead{
+  display:flex;justify-content:space-between;gap:var(--s4);align-items:baseline;
+  font:400 var(--t-xs)/1.4 var(--f-type);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--c-quiet);border-bottom:1px solid rgba(43,38,34,.24);
+  padding-bottom:var(--s2);margin-bottom:var(--s6);
+}
+.pghead b{font-weight:700;color:var(--ink)}
+.pghead span:last-child{white-space:nowrap}
+
+h2{font:700 clamp(30px,4.6vw,44px)/1.08 var(--f-hand);letter-spacing:.01em;margin-bottom:var(--s4)}
+.h2wrap{position:relative;display:inline-block;margin-bottom:var(--s5)}
+.h2wrap h2{margin-bottom:2px}
+.h2wrap svg{position:absolute;left:-4px;bottom:-10px;width:calc(100% + 8px);height:16px;overflow:visible}
+
+/* hand ink */
+.hand{font-family:var(--f-hand);font-weight:400}
+.note{font:400 var(--t-note)/1.3 var(--f-hand);color:var(--c-note)}
+.note-red{color:var(--red)}
+.typed{font:400 var(--t-s)/1.7 var(--f-type)}
+.hl{background:linear-gradient(100deg, transparent 0 2%, rgba(255,227,77,.85) 5% 95%, transparent 98%);
+  padding:0 4px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* reveals — unified transform channel (drag uses --dx/--dy too) */
+.rv{opacity:0;transform:translate(var(--dx,0px),calc(var(--dy,0px) + 16px)) rotate(var(--rot,0deg));
+  transition:opacity .6s var(--ease), transform .6s var(--ease)}
+.rv.on{opacity:1;transform:translate(var(--dx,0px),var(--dy,0px)) rotate(var(--rot,0deg))}
+.rot{transform:translate(var(--dx,0px),var(--dy,0px)) rotate(var(--rot,0deg))}
+
+/* draw-on strokes (dasharray/offset set from getTotalLength in JS) */
+svg.go .dp{stroke-dashoffset:0 !important;
+  transition:stroke-dashoffset var(--dur,var(--d-draw)) var(--ease) var(--dd,0ms)}
+
+/* ------------------------------------------------------------------
+   Tape, pins, cards
+------------------------------------------------------------------ */
+.tape-card{position:relative;background:var(--paper-card);border:1px solid rgba(43,38,34,.13);
+  box-shadow:0 2px 6px rgba(43,38,34,.12), 0 10px 22px rgba(43,38,34,.07);
+  padding:var(--s5) var(--s5) var(--s5)}
+.tape-card::before,.tape-card::after{content:"";position:absolute;width:96px;height:27px;
+  background:var(--tape);box-shadow:0 1px 2px rgba(43,38,34,.14);opacity:.95;
+  clip-path:polygon(2% 12%,6% 0,95% 5%,100% 18%,98% 88%,93% 100%,5% 96%,0 82%)}
+.tape-card::before{top:-13px;left:-26px;transform:rotate(-35deg)}
+.tape-card::after{top:-13px;right:-26px;transform:rotate(33deg)}
+.washi::before,.washi::after{background:
+  repeating-linear-gradient(45deg, rgba(196,55,43,.30) 0 5px, rgba(243,229,171,.72) 5px 11px)}
+.drag{cursor:grab;touch-action:pan-y}
+.drag.dragging{cursor:grabbing;user-select:none;z-index:30;
+  box-shadow:0 6px 14px rgba(43,38,34,.2), 0 22px 44px rgba(43,38,34,.14);transition:none}
+.draghint{position:absolute;right:10px;bottom:6px;font:400 15px var(--f-hand);
+  color:var(--c-quiet);opacity:.75;pointer-events:none}
+@media(pointer:coarse){.draghint{display:none}}
+
+/* ------------------------------------------------------------------
+   EN ROUTE — cover
+------------------------------------------------------------------ */
+.propof{font:400 var(--t-s) var(--f-type);letter-spacing:.3em;text-transform:uppercase;color:var(--c-quiet)}
+.h1wrap{position:relative;display:inline-block;margin:var(--s2) 0 var(--s3)}
+h1{font:700 clamp(76px,15vw,138px)/0.95 var(--f-hand);letter-spacing:.01em}
+.h1wrap svg{position:absolute;left:-30px;top:-16px;width:calc(100% + 62px);height:calc(100% + 34px);
+  overflow:visible;pointer-events:none}
+.role{font:500 clamp(18px,2.4vw,22px)/1.5 var(--f-body);max-width:34ch}
+.role em{font-style:italic;color:var(--red)}
+.scribble{margin-top:var(--s4);max-width:30ch;transform:rotate(-1.6deg)}
+.coverrow{display:flex;flex-wrap:wrap;gap:var(--s6);align-items:flex-start;justify-content:space-between}
+.coverleft{flex:1 1 380px;min-width:min(100%,340px)}
+.vitals{flex:0 1 330px;font:400 var(--t-s)/1.9 var(--f-type);--rot:1.8deg;margin-top:var(--s4)}
+.vitals h3{font:700 var(--t-s) var(--f-type);letter-spacing:.2em;border-bottom:1px dashed rgba(43,38,34,.35);
+  padding-bottom:var(--s2);margin-bottom:var(--s3)}
+.vitals li{list-style:none;display:flex;gap:10px;align-items:baseline}
+.vitals li::before{content:"▸";color:var(--red);font-size:11px}
+.vitals .vnote{margin-top:var(--s3);font:400 17px/1.25 var(--f-hand);color:var(--c-note)}
+.statusline{margin-top:var(--s6);display:flex;flex-wrap:wrap;gap:var(--s5);align-items:center}
+.statusline .typed{letter-spacing:.08em}
+.stamp{display:inline-block;border:3px solid var(--red);outline:1px solid rgba(196,55,43,.55);
+  outline-offset:3px;color:var(--red);border-radius:5px;
+  font:700 15px/1 var(--f-body);letter-spacing:.22em;padding:11px 15px 9px;
+  transform:rotate(-7deg);opacity:.88}
+.ttabs{margin-top:var(--s6);display:flex;flex-wrap:wrap;gap:var(--s3)}
+.ttab{position:relative;display:inline-flex;align-items:center;min-height:40px;
+  background:var(--tape);padding:8px 18px;text-decoration:none;color:var(--ink);
+  font:700 var(--t-s) var(--f-type);letter-spacing:.06em;
+  clip-path:polygon(2% 14%,5% 0,96% 4%,100% 20%,99% 86%,94% 100%,4% 97%,0 80%);
+  transform:rotate(var(--rot,0deg));transition:transform var(--d-fast) var(--ease)}
+.ttab:hover{transform:rotate(0deg) scale(1.04);color:var(--red)}
+.ttab:active{transform:scale(.97)}
+.coffee{position:absolute;right:6%;top:34px;width:130px;height:120px;pointer-events:none;opacity:.9}
+.margnote{position:absolute;left:8px;bottom:26px;font:400 17px/1.2 var(--f-hand);
+  color:var(--c-quiet);transform:rotate(-90deg);transform-origin:0 100%}
+
+/* ------------------------------------------------------------------
+   LOG
+------------------------------------------------------------------ */
+.map{width:100%;height:auto;display:block;margin:0 0 var(--s6)}
+.figcap{font:400 var(--t-xs) var(--f-type);letter-spacing:.12em;color:var(--c-quiet);
+  text-transform:uppercase;margin:-14px 0 var(--s6)}
+.entries{display:grid;gap:var(--s7);margin-top:var(--s5)}
+.entry{max-width:640px}
+.entry:nth-child(even){margin-left:auto}
+.entry .edate{font:700 var(--t-xs) var(--f-type);letter-spacing:.18em;text-transform:uppercase;
+  color:var(--red);margin-bottom:var(--s2)}
+.entry h3{font:700 var(--t-m)/1.3 var(--f-body);margin-bottom:var(--s2)}
+.entry p{max-width:56ch}
+.entry .ann{margin-top:var(--s3);transform:rotate(-1.2deg)}
+.papers{margin-top:var(--s7);position:relative;max-width:560px;--rot:-1.3deg}
+.papers .staple{position:absolute;top:-7px;left:44px;width:26px;height:12px}
+.papers dt{font:700 var(--t-xs) var(--f-type);letter-spacing:.2em;color:var(--c-quiet);margin-top:var(--s3)}
+.papers dd{font:400 var(--t-s)/1.7 var(--f-type)}
+.papers dd.note{font:400 19px/1.35 var(--f-hand);color:var(--c-note)}
+
+/* ------------------------------------------------------------------
+   SPECIMENS
+------------------------------------------------------------------ */
+.spec{position:relative;margin:0 0 var(--s6);border:1px solid rgba(43,38,34,.16);
+  background:var(--paper-card);box-shadow:0 2px 6px rgba(43,38,34,.1), 0 10px 24px rgba(43,38,34,.07)}
+.spec .pin{position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:30px;height:34px;z-index:2}
+.spec summary{list-style:none;cursor:pointer;padding:var(--s5) var(--s5) var(--s4);
+  display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);align-items:baseline;
+  transition:background var(--d-fast) var(--ease)}
+.spec summary::-webkit-details-marker{display:none}
+.spec summary:hover{background:rgba(255,227,77,.14)}
+.spec summary:active{background:rgba(255,227,77,.24)}
+.spec .sname{font:700 var(--t-l)/1 var(--f-hand)}
+.spec .stag{font:400 var(--t-xs)/1.6 var(--f-type);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--c-quiet);border:1px solid rgba(43,38,34,.28);padding:3px 9px;border-radius:2px}
+.spec .unfold{margin-left:auto;font:400 19px var(--f-hand);color:var(--c-note);white-space:nowrap}
+.spec[open] .unfold .closed-t{display:none}
+.spec:not([open]) .unfold .open-t{display:none}
+.spec-body{padding:0 var(--s5) var(--s6);border-top:1px dashed rgba(43,38,34,.3)}
+.spec[open] .spec-body{animation:unfold var(--d-med) var(--ease)}
+@keyframes unfold{from{opacity:0;transform:translateY(-10px)}}
+.spec-body p{max-width:60ch;margin-top:var(--s4)}
+.spec-body .lead{font-weight:500}
+.rules{margin:var(--s5) 0;display:grid;gap:var(--s3);max-width:56ch}
+.rules li{list-style:none;position:relative;font:400 var(--t-note)/1.25 var(--f-hand);
+  color:var(--red);padding-left:26px}
+.rules li::before{content:"";position:absolute;left:0;top:.42em;width:15px;height:15px;
+  border:2.5px solid var(--red);border-radius:50% 42% 55% 46%;transform:rotate(-12deg)}
+.sketchrow{display:flex;flex-wrap:wrap;gap:var(--s5);margin:var(--s5) 0 var(--s2)}
+.sketch{text-align:center}
+.sketch svg{display:block;margin:0 auto var(--s1)}
+.sketch b{font:400 18px/1.2 var(--f-hand);color:var(--ink-soft);font-weight:400}
+.ndanote{margin-top:var(--s5);font:400 var(--t-s)/1.6 var(--f-type);color:var(--c-quiet);
+  border-top:1px dashed rgba(43,38,34,.3);padding-top:var(--s3)}
+.casegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:var(--s6) var(--s5);margin-top:var(--s7)}
+.case{position:relative;background:var(--paper-card);border:1px solid rgba(43,38,34,.14);
+  padding:var(--s5);box-shadow:0 2px 5px rgba(43,38,34,.1)}
+.case .pin{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:26px;height:30px}
+.case h3{font:700 var(--t-l)/1 var(--f-hand);margin-bottom:var(--s2)}
+.case p{font-size:var(--t-s);line-height:1.6;max-width:34ch}
+.case .go{display:inline-block;margin-top:var(--s3);font:400 19px var(--f-hand)}
+.jar{border:1.5px dashed rgba(43,38,34,.35);background:transparent;box-shadow:none}
+.jar h3{color:var(--ink-soft)}
+
+/* ------------------------------------------------------------------
+   SHELF
+------------------------------------------------------------------ */
+.shelfgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:var(--s7) var(--s6);margin-top:var(--s5);align-items:start}
+.photo{position:relative;background:#fdfaf1;padding:10px 10px 12px;
+  border:1px solid rgba(43,38,34,.1);
+  box-shadow:0 2px 6px rgba(43,38,34,.14), 0 12px 26px rgba(43,38,34,.09)}
+.photo img{display:block;width:100%;height:auto;filter:saturate(.96)}
+.photo figcaption{font:400 19px/1.25 var(--f-hand);color:var(--c-note);padding:10px 4px 2px}
+.photo::before,.photo::after{content:"";position:absolute;width:74px;height:22px;
+  background:var(--tape);box-shadow:0 1px 2px rgba(43,38,34,.15);
+  clip-path:polygon(3% 15%,7% 0,94% 6%,100% 22%,98% 85%,92% 100%,6% 96%,0 78%)}
+.photo::before{top:-10px;left:-20px;transform:rotate(-40deg)}
+.photo::after{top:-10px;right:-20px;transform:rotate(38deg)}
+.shelffoot{margin-top:var(--s6);display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);align-items:baseline}
+
+/* ------------------------------------------------------------------
+   KIT
+------------------------------------------------------------------ */
+.kitlist{margin-top:var(--s4);max-width:640px}
+.kit-item{display:flex;align-items:baseline;gap:var(--s4);padding:var(--s3) 0;
+  border-bottom:1px dotted rgba(43,38,34,.28);position:relative}
+.kit-item input{position:absolute;width:30px;height:30px;opacity:0;cursor:pointer}
+.kit-item .box{flex:none;position:relative;top:4px}
+.kit-item input:focus-visible ~ .box{outline:2px dashed var(--red);outline-offset:3px}
+.kit-item .tick{stroke-dasharray:1;stroke-dashoffset:1;
+  transition:stroke-dashoffset .45s var(--ease)}
+.kit-item input:checked ~ .box .tick{stroke-dashoffset:0}
+.kit-item .tool{font:500 var(--t-m) var(--f-body);min-width:9.5ch}
+.kit-item .quip{font:400 20px/1.3 var(--f-hand);color:var(--c-note)}
+.kitfoot{margin-top:var(--s6);max-width:34ch;transform:rotate(-1deg)}
+
+/* ------------------------------------------------------------------
+   MARGINS
+------------------------------------------------------------------ */
+.marggrid{display:flex;flex-wrap:wrap;gap:var(--s7) var(--s8);align-items:flex-start;
+  margin-top:var(--s5);position:relative}
+.conf{font:400 clamp(24px,3vw,31px)/1.2 var(--f-hand);max-width:15ch}
+.conf.red{color:var(--red)}.conf.blue{color:var(--c-note)}.conf.soft{color:var(--ink-soft)}
+.conf .u{position:relative;white-space:nowrap}
+.conf .u svg{position:absolute;left:0;bottom:-7px;width:100%;height:12px;overflow:visible}
+.vertical{writing-mode:vertical-rl;transform:rotate(180deg);max-height:340px;font-size:24px}
+.grade{font:700 26px/1 var(--f-hand);color:var(--red);transform:rotate(-8deg);
+  border:2.5px solid var(--red);border-radius:6px;padding:10px 14px;align-self:center}
+
+/* ------------------------------------------------------------------
+   REACH ME
+------------------------------------------------------------------ */
+.iffound{font:700 clamp(22px,3.4vw,34px)/1.35 var(--f-type);letter-spacing:.06em;max-width:22ch}
+.bigarrow{display:block;width:min(300px,52vw);height:auto;margin:var(--s4) 0 var(--s2) var(--s6)}
+.contactlist{display:grid;gap:var(--s4);margin:var(--s5) 0 var(--s7)}
+.contactlist a{font:700 clamp(30px,4.6vw,44px)/1.15 var(--f-hand);text-decoration:none;
+  color:var(--ink);width:fit-content;position:relative;word-break:break-word}
+.contactlist a small{font:400 var(--t-s) var(--f-type);color:var(--c-quiet);letter-spacing:.14em;
+  display:block;margin-bottom:-4px}
+.contactlist a svg{position:absolute;left:0;bottom:-8px;width:100%;height:14px;overflow:visible}
+.contactlist a:hover{color:var(--red)}
+.resume{position:relative;max-width:430px;--rot:1.4deg;padding-top:var(--s6)}
+.resume .clipsvg{position:absolute;top:-24px;left:26px;width:26px;height:58px}
+.resume h3{font:700 var(--t-s) var(--f-type);letter-spacing:.2em;margin-bottom:var(--s2)}
+.resume p{font-size:var(--t-s);max-width:40ch}
+.resume .dl{display:inline-flex;align-items:center;min-height:44px;margin-top:var(--s3);
+  font:700 var(--t-s) var(--f-type);letter-spacing:.06em;color:var(--ink);
+  background:rgba(255,227,77,.5);padding:8px 16px;text-decoration:none;
+  border:1.5px solid rgba(43,38,34,.4);border-radius:3px;
+  box-shadow:2px 2px 0 rgba(43,38,34,.28);transition:all var(--d-fast) var(--ease)}
+.resume .dl:hover{background:rgba(255,227,77,.9);color:var(--ink)}
+.resume .dl:active{transform:translate(2px,2px);box-shadow:0 0 0 rgba(43,38,34,.28)}
+.signoff{margin-top:var(--s8);display:flex;flex-wrap:wrap;gap:var(--s5) var(--s7);align-items:flex-end;justify-content:space-between}
+.sig{font:700 clamp(44px,6vw,64px)/1 var(--f-hand);transform:rotate(-3deg)}
+.sig small{display:block;font:400 20px/1.4 var(--f-hand);color:var(--c-quiet);transform:none}
+footer{max-width:920px;margin:0 auto;padding:0 var(--s2)}
+footer p{font:400 var(--t-xs)/1.8 var(--f-type);letter-spacing:.12em;color:var(--c-quiet);
+  text-transform:uppercase}
+
+/* ------------------------------------------------------------------
+   Responsive — the mobile notebook is a narrower notebook, not a squeeze
+------------------------------------------------------------------ */
+@media(max-width:900px){
+  :root{--bind-w:28px}
+  main{padding:var(--s5) var(--s3) 140px calc(var(--bind-w) + 8px)}
+  .tabs{top:auto;bottom:0;right:0;left:0;transform:none;flex-direction:row;gap:0;
+    border-top:1.5px solid rgba(43,38,34,.35);background:var(--paper-deep);
+    box-shadow:0 -4px 14px rgba(43,38,34,.14)}
+  .tabs a{writing-mode:horizontal-tb;flex:1;text-align:center;border:none;
+    border-right:1px solid rgba(43,38,34,.2);border-radius:0;box-shadow:none;
+    transform:none;padding:0 2px;min-height:52px;display:flex;align-items:center;justify-content:center;
+    font-size:9px;letter-spacing:.05em}
+  .tabs a:last-child{border-right:none}
+  .tabs a[aria-current]{box-shadow:inset 0 -3px 0 var(--red)}
+  .tabs a[aria-current]::after{content:""}
+  .tabs a:hover,.tabs a:focus-visible{transform:none}
+  .entry:nth-child(even){margin-left:0}
+  .coffee{width:88px;height:82px;right:2%;top:14px}
+  .margnote{display:none}
+  .vertical{writing-mode:horizontal-tb;transform:rotate(-3deg);max-height:none}
+  .vitals{--rot:0.8deg}
+  .conf{max-width:24ch}
+}
+@media(pointer:coarse),(max-width:760px){
+  .ttab{min-height:44px}
+  .kit-item{min-height:44px}
+  .kit-item input{width:44px;height:44px;top:-4px}
+  .contactlist a{min-height:44px;display:inline-block}
+  .spec summary{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transition:none;transform:translate(var(--dx,0px),var(--dy,0px)) rotate(var(--rot,0deg))}
+  svg.go .dp,.dp{transition:none !important}
+  .page.flip{animation:none}
+  .spec[open] .spec-body{animation:none}
+  .kit-item .tick{transition:none}
+  .ttab,.tabs a,.resume .dl{transition:none}
+}
+</style>
+<noscript><style>
+  .rv{opacity:1;transform:translate(0,0) rotate(var(--rot,0deg))}
+  .draghint{display:none}
+</style></noscript>
+
+<a class="skip" href="#route">skip to the notebook</a>
+
+<!-- ring binding, fixed to the spine -->
+<svg class="binding" aria-hidden="true">
+  <defs>
+    <pattern id="rings" width="46" height="62" patternUnits="userSpaceOnUse">
+      <circle cx="27" cy="31" r="6.5" fill="var(--paper-deep)" stroke="rgba(43,38,34,.30)" stroke-width="1.4"/>
+      <path d="M27 31 C 12 29, 7 17, 20 12" fill="none" stroke="var(--wire)" stroke-width="3.4" stroke-linecap="round"/>
+      <path d="M27 31 C 12 29, 7 17, 20 12" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1" stroke-linecap="round"/>
+    </pattern>
+  </defs>
+  <rect width="46" height="100%" fill="url(#rings)"/>
+</svg>
+
+<!-- index tabs -->
+<nav class="tabs" aria-label="Notebook sections">
+  <a class="tb1" href="#route">EN&nbsp;ROUTE</a>
+  <a class="tb2" href="#log">LOG</a>
+  <a class="tb3" href="#specimens">SPECIMENS</a>
+  <a class="tb4" href="#kit">KIT</a>
+  <a class="tb5" href="#margins">MARGINS</a>
+  <a class="tb6" href="#reach">REACH&nbsp;ME</a>
+</nav>
+
+<div class="clip">
+<main>
+
+  <!-- ============================================================ -->
+  <section class="page" id="route" aria-label="En route — cover page">
+    <div class="pghead"><span><b>FIELD NOTES · VOL. 1</b> — the mess before the spec</span><span>pg. 01</span></div>
+
+    <svg class="coffee" viewBox="0 0 130 120" aria-hidden="true">
+      <ellipse cx="65" cy="60" rx="52" ry="46" fill="none" stroke="rgba(122,75,33,.16)" stroke-width="9" stroke-dasharray="200 30 60 18" transform="rotate(-14 65 60)"/>
+      <ellipse cx="66" cy="61" rx="44" ry="39" fill="none" stroke="rgba(122,75,33,.10)" stroke-width="5" stroke-dasharray="90 40 130 26" transform="rotate(22 66 61)"/>
+    </svg>
+
+    <div class="coverrow">
+      <div class="coverleft">
+        <p class="propof rv">Property of</p>
+        <div class="h1wrap rv">
+          <h1>Anhad</h1>
+          <svg viewBox="0 0 460 150" preserveAspectRatio="none" aria-hidden="true">
+            <path class="dp" d="M36 78 C 20 30, 130 6, 236 10 C 352 14, 442 34, 438 76 C 434 116, 330 142, 196 138 C 84 134, 46 114, 40 70 C 38 58, 44 48, 56 42"
+              fill="none" stroke="var(--red)" stroke-width="3.4" stroke-linecap="round" style="--dur:1300ms"/>
+          </svg>
+        </div>
+        <p class="role rv">Product manager. Designs the interfaces he specs.
+          <em>Certified AI-first PM</em> — the certificate is real, the instincts came first.</p>
+        <p class="note scribble rv">making sense of chaos, one <span class="hl">“wait, why?”</span> at a time.</p>
+
+        <div class="statusline rv">
+          <span class="typed">BASE: Punjab, India<br>RANGE: worldwide</span>
+          <span class="stamp" role="img" aria-label="Stamp: open to work">OPEN&nbsp;TO&nbsp;WORK</span>
+        </div>
+
+        <div class="ttabs rv" aria-label="Quick contact">
+          <a class="ttab" style="--rot:-1.6deg" href="mailto:anhadsb2@gmail.com">email me</a>
+          <a class="ttab" style="--rot:1.2deg" href="https://www.linkedin.com/in/anhad-singh-180925183/" target="_blank" rel="noopener">LinkedIn ↗</a>
+          <a class="ttab" style="--rot:-0.8deg" href="tel:+919115551310">call +91 91155 51310</a>
+          <a class="ttab" style="--rot:1.8deg" href="{{RESUME_HREF}}" download="Anhad-Resume.pdf">résumé (pdf)</a>
+        </div>
+      </div>
+
+      <aside class="vitals tape-card drag rv" aria-label="Vitals — the sixty second version">
+        <h3>VITALS — 60-SEC SCAN</h3>
+        <ul>
+          <li><span class="hl">2+ yrs</span>&nbsp;in product</li>
+          <li><span class="hl">+78% YoY</span>&nbsp;revenue grown</li>
+          <li>14 → <span class="hl">40+</span>&nbsp;listings scaled</li>
+          <li><span class="hl">3</span>&nbsp;verification models shipped</li>
+          <li><span class="hl">60% faster</span>&nbsp;resolution cycles</li>
+          <li><span class="hl">5</span>&nbsp;public case studies</li>
+        </ul>
+        <p class="vnote">recruiters: this card is the 60-second version. the rest is the fun part.</p>
+        <span class="draghint">(taped, not glued — drag me)</span>
+      </aside>
+    </div>
+
+    <span class="margnote" aria-hidden="true">yes, the coffee was necessary.</span>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="page pg-ruled" id="log" aria-label="Expedition log — the journey">
+    <div class="pghead"><span><b>EXPEDITION LOG</b> — punjab → canada → home</span><span>pg. 02</span></div>
+    <div class="rulepad">
+    <div class="h2wrap rv"><h2>Where this notebook has been</h2>
+      <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true">
+        <path class="dp" d="M4 9 C 60 3, 150 12, 296 6" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <svg class="map rv" viewBox="0 0 640 300" role="img" aria-label="Hand-drawn route map: Punjab to Canada in 2023, and back home">
+      <!-- canada blob -->
+      <path d="M60 96 C 52 62, 96 40, 150 44 C 204 48, 240 58, 236 86 C 232 112, 196 128, 140 126 C 96 124, 66 118, 60 96 Z"
+        fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+      <!-- india-ish blob -->
+      <path d="M462 190 C 452 160, 486 142, 530 148 C 574 154, 596 172, 588 202 C 580 236, 546 262, 516 250 C 488 240, 470 216, 462 190 Z"
+        fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+      <!-- outbound: dashed blue -->
+      <path class="dp" d="M500 196 C 430 120, 320 62, 168 78" fill="none" stroke="var(--blue)"
+        stroke-width="2.6" stroke-linecap="round" stroke-dasharray="none" style="--dur:1200ms"/>
+      <!-- return: dashed red -->
+      <path class="dp" d="M150 104 C 260 190, 380 246, 486 224" fill="none" stroke="var(--red)"
+        stroke-width="2.6" stroke-linecap="round" style="--dur:1200ms;--dd:900ms"/>
+      <path class="dp" d="M472 230 L 488 224 L 478 210" fill="none" stroke="var(--red)"
+        stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="--dur:300ms;--dd:2100ms"/>
+      <!-- plane doodle on outbound -->
+      <g transform="translate(322,96) rotate(-16)" opacity=".85">
+        <path d="M0 6 L 26 6 M8 6 L 2 -4 M8 6 L 2 16 M20 6 L 16 0 M20 6 L 16 12"
+          stroke="var(--blue)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </g>
+      <circle cx="160" cy="88" r="5" fill="var(--blue)"/>
+      <path d="M494 200 l4 -12 l4 12 l12 2 l-12 5 l-2 13 l-6 -12 l-12 1 l9 -9 Z" fill="var(--red)" opacity=".9"/>
+      <text x="96" y="160" font-size="22" fill="var(--ink)">Canada · 2023–24</text>
+      <text x="96" y="184" font-size="17" fill="var(--ink-soft)">(Quesada — ops, CX)</text>
+      <text x="452" y="290" font-size="22" fill="var(--ink)">Punjab — start, and now</text>
+      <text x="300" y="52" font-size="18" fill="var(--blue)" transform="rotate(-10 300 52)">2023 →</text>
+      <text x="300" y="248" font-size="18" fill="var(--red)" transform="rotate(9 300 248)">← home</text>
+    </svg>
+    <p class="figcap">fig. 1 — the loop home. drawn from memory, like all good maps.</p>
+
+    <div class="entries">
+      <article class="entry rv">
+        <p class="edate">Entry 01 · Punjab · origin</p>
+        <h3>The kid with the screwdriver</h3>
+        <p>Took the tape recorder apart to see why it sang. It never sang again. The habit of asking
+           <span class="hl">why does this work</span> survived the tape recorder, three careers and two continents.</p>
+        <p class="note note-red ann">still asking.</p>
+      </article>
+
+      <article class="entry tape-card washi drag rv" style="--rot:0.9deg">
+        <p class="edate">Entry 02 · Jan 2023 – Feb 2024 · Quesada, Canada</p>
+        <h3>Operations Manager — new market, no map</h3>
+        <p>Brand strategy alongside executive leadership in a market that owed us nothing. Rebuilt the
+           CX processes end to end — customer-satisfaction indicators climbed <span class="hl">+20%</span>.
+           Monthly market research and competitive benchmarking: read the room, then the spreadsheets,
+           then the room again.</p>
+        <p class="note ann">first time I watched a queue like it was a product. it was.</p>
+      </article>
+
+      <article class="entry tape-card washi drag rv" style="--rot:-1deg">
+        <p class="edate">Entry 03 · Feb 2024 – May 2026 · Zen Den Homes</p>
+        <h3>Growth &amp; Operations Lead — luxury short-term rentals</h3>
+        <p>Scaled the portfolio <span class="hl">14 → 40+ listings</span> and revenue
+           <span class="hl">+78% YoY</span>; occupancy up <span class="hl">+30%</span> on dynamic pricing.
+           Wrote the onboarding workflow and the SOPs — ramp-up 30% faster, issue resolution
+           <span class="hl">60% faster</span>.</p>
+        <p class="note ann">an SOP is just a product you ship to your teammates.</p>
+      </article>
+
+      <article class="entry tape-card washi drag rv" style="--rot:0.7deg">
+        <p class="edate">Entry 04 · May 2026 – present · Blostem</p>
+        <h3>Product — B2B fintech infrastructure</h3>
+        <p>Zerodha (Rainmatter)-backed. I own <strong>product and design</strong> for
+           <strong>Jaano</strong> and <strong>VoiceBrew</strong> — the journeys, the consoles,
+           and the design system they all run on.</p>
+        <p class="note note-red ann">home. the interesting problems followed me here. → specimens, next page</p>
+      </article>
+    </div>
+
+    <dl class="papers tape-card rv">
+      <svg class="staple" viewBox="0 0 26 12" aria-hidden="true">
+        <path d="M2 10 L2 3 L24 3 L24 10" fill="none" stroke="var(--ink-soft)" stroke-width="2.4"/>
+      </svg>
+      <dt>Papers carried</dt>
+      <dd>B.Com (Hons) — Chitkara University</dd>
+      <dt>Stamps collected</dt>
+      <dd>AI-First Product Management Launchpad — Airtribe<br>
+          Product Analytics — The Product School<br>
+          JIRA — Udemy</dd>
+      <dt>Spoken en route</dt>
+      <dd>English · Hindi · Punjabi</dd>
+      <dd class="note" style="margin-top:6px">three languages. I ship products in all of them.</dd>
+    </dl>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="page pg-dots" id="specimens" aria-label="Specimens — collected work">
+    <div class="pghead"><span><b>SPECIMENS</b> — collected work, pinned</span><span>pg. 03</span></div>
+    <div class="h2wrap rv"><h2>Handle with curiosity</h2>
+      <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true">
+        <path class="dp" d="M4 8 C 80 14, 180 2, 296 9" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <p class="note rv" style="max-width:34ch;margin-bottom:var(--s7)">two specimens are under NDA — the notes are mine, the pixels stay home.</p>
+
+    <details class="spec rv" id="jaano">
+      <summary>
+        <svg class="pin" viewBox="0 0 30 34" aria-hidden="true">
+          <ellipse cx="15" cy="30" rx="7" ry="2.6" fill="rgba(43,38,34,.18)"/>
+          <path d="M15 18 L15 29" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="15" cy="11" r="8.5" fill="var(--red)"/>
+          <circle cx="12" cy="8" r="2.6" fill="rgba(255,255,255,.45)"/>
+        </svg>
+        <span class="sname">Specimen A — Jaano</span>
+        <span class="stag">Video KYC + Video PD · RBI-compliant · day job</span>
+        <span class="unfold"><span class="closed-t">unfold the page ↓</span><span class="open-t">fold it back ↑</span></span>
+      </summary>
+      <div class="spec-body">
+        <p class="lead">Role: product <em>and</em> design owner. Both chairs, one desk.</p>
+        <p>Discovery meant sitting with auditors, underwriters, compliance and ops until their day
+           made sense to me — then writing the product around it. Defined, prioritised and shipped
+           <span class="hl">three verification models</span>:</p>
+        <div class="sketchrow" aria-hidden="true">
+          <div class="sketch">
+            <svg width="118" height="82" viewBox="0 0 118 82">
+              <rect x="30" y="14" width="58" height="40" rx="4" fill="none" stroke="var(--ink)" stroke-width="2"/>
+              <circle cx="14" cy="30" r="8" fill="none" stroke="var(--ink)" stroke-width="2"/>
+              <path d="M14 38 C 12 48, 16 48, 14 56" stroke="var(--ink)" stroke-width="2" fill="none"/>
+              <circle cx="104" cy="30" r="8" fill="none" stroke="var(--ink)" stroke-width="2"/>
+              <path d="M104 38 C 102 48, 106 48, 104 56" stroke="var(--ink)" stroke-width="2" fill="none"/>
+              <path d="M40 34 C 50 26, 68 26, 78 34" stroke="var(--blue)" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+              <path d="M44 44 h30" stroke="var(--ink-soft)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <b>officer-led</b>
+          </div>
+          <div class="sketch">
+            <svg width="118" height="82" viewBox="0 0 118 82">
+              <rect x="44" y="8" width="30" height="56" rx="6" fill="none" stroke="var(--ink)" stroke-width="2"/>
+              <circle cx="59" cy="26" r="7" fill="none" stroke="var(--ink)" stroke-width="2"/>
+              <path d="M50 44 C 54 38, 64 38, 68 44" stroke="var(--ink)" stroke-width="2" fill="none"/>
+              <path d="M80 54 l7 8 l14 -18" stroke="var(--red)" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <b>self-serve</b>
+          </div>
+          <div class="sketch">
+            <svg width="118" height="82" viewBox="0 0 118 82">
+              <rect x="34" y="8" width="30" height="56" rx="6" fill="none" stroke="var(--ink)" stroke-width="2"/>
+              <circle cx="49" cy="28" r="9" fill="none" stroke="var(--blue)" stroke-width="2"/>
+              <circle cx="46" cy="26" r="1.4" fill="var(--blue)"/><circle cx="52" cy="26" r="1.4" fill="var(--blue)"/>
+              <path d="M45 31 C 47 34, 51 34, 53 31" stroke="var(--blue)" stroke-width="1.6" fill="none"/>
+              <path d="M70 22 C 78 18, 78 30, 86 26 C 92 23, 92 32, 99 29" stroke="var(--blue)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>
+            <b>AI avatar-guided</b>
+          </div>
+        </div>
+        <p>Designed the customer journeys, the <strong>admin, agent and auditor consoles</strong>, and the
+           design system they all run on. Defined the reporting suite with underwriter input —
+           one case report, eight ops reports.</p>
+        <ul class="rules">
+          <li>AI signals advise, a human decides.</li>
+          <li>no customer dead-ends. ever.</li>
+          <li>configurability is the lead USP — checklists, languages, journeys, all tenant-configurable. my framing.</li>
+        </ul>
+        <p>Also wrote the positioning and the buyer decks that took it to banks — every claim
+           verified line-by-line against production code.</p>
+        <p class="ndanote">NDA — no screenshots, no client names.
+          <a href="mailto:anhadsb2@gmail.com?subject=Tell%20me%20about%20Jaano">ask me about it →</a></p>
+      </div>
+    </details>
+
+    <details class="spec rv" id="voicebrew">
+      <summary>
+        <svg class="pin" viewBox="0 0 30 34" aria-hidden="true">
+          <ellipse cx="15" cy="30" rx="7" ry="2.6" fill="rgba(43,38,34,.18)"/>
+          <path d="M15 18 L15 29" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="15" cy="11" r="8.5" fill="var(--blue)"/>
+          <circle cx="12" cy="8" r="2.6" fill="rgba(255,255,255,.45)"/>
+        </svg>
+        <span class="sname">Specimen B — VoiceBrew</span>
+        <span class="stag">AI voice agents · BFSI · day job</span>
+        <span class="unfold"><span class="closed-t">unfold the page ↓</span><span class="open-t">fold it back ↑</span></span>
+      </summary>
+      <div class="spec-body">
+        <p class="lead">Role: 0-to-1 feature PM + designer.</p>
+        <p>Defined <span class="hl">campaign scheduling and outcome-based sequencing</span> from scratch —
+           event-gated campaign journeys, taken from first flows all the way to build-spec.</p>
+        <svg class="rv" width="100%" height="110" viewBox="0 0 440 110" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Sketch of an outcome-gated call sequence: call, no answer, retry loop, connected, outcome">
+          <path d="M30 70 H 410" stroke="var(--ink-faint)" stroke-width="2" stroke-dasharray="5 6"/>
+          <circle cx="50" cy="70" r="9" fill="none" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="160" cy="70" r="9" fill="none" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="270" cy="70" r="9" fill="none" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="380" cy="70" r="9" fill="var(--red)" opacity=".85"/>
+          <path class="dp" d="M160 58 C 140 26, 76 26, 56 54" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" style="--dur:700ms"/>
+          <path class="dp" d="M62 48 L 56 55 L 65 57" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" style="--dur:200ms;--dd:700ms"/>
+          <text x="34" y="98" font-size="17" fill="var(--ink)">call</text>
+          <text x="128" y="98" font-size="17" fill="var(--ink)">no answer</text>
+          <text x="238" y="98" font-size="17" fill="var(--ink)">connected</text>
+          <text x="352" y="98" font-size="17" fill="var(--red)">outcome ✓</text>
+          <text x="84" y="22" font-size="16" fill="var(--blue)">retry — but only if the event says so</text>
+        </svg>
+        <p>Spec'd the internal control plane: telemetry, a metrics catalogue, RBAC, SLOs, call replay.
+           Turned each BFSI client's process into <strong>call flows and lead schemas</strong> —
+           collections, card activation, welcome + loan outreach.</p>
+        <p class="ndanote">NDA — the voices stay in the building.
+          <a href="mailto:anhadsb2@gmail.com?subject=Tell%20me%20about%20VoiceBrew">ask me about it →</a></p>
+      </div>
+    </details>
+
+    <div class="casegrid">
+      <article class="case rv" style="--rot:-0.9deg">
+        <svg class="pin" viewBox="0 0 30 34" aria-hidden="true"><ellipse cx="15" cy="30" rx="7" ry="2.6" fill="rgba(43,38,34,.18)"/><path d="M15 18 L15 29" stroke="var(--ink)" stroke-width="2"/><circle cx="15" cy="11" r="8.5" fill="var(--ink-soft)"/></svg>
+        <h3>Specimen C — Playo</h3>
+        <p>SportsTech growth study. ARPU <span class="hl">₹300 → ₹1,000</span> — the levers, priced and sequenced.</p>
+        <a class="go" href="https://drive.google.com/file/d/1JMeBFKTOdE03ffiWhw7lwNVqb7325PWH/view" target="_blank" rel="noopener">read the case study ↗</a>
+      </article>
+      <article class="case rv" style="--rot:0.8deg">
+        <svg class="pin" viewBox="0 0 30 34" aria-hidden="true"><ellipse cx="15" cy="30" rx="7" ry="2.6" fill="rgba(43,38,34,.18)"/><path d="M15 18 L15 29" stroke="var(--ink)" stroke-width="2"/><circle cx="15" cy="11" r="8.5" fill="var(--ink-soft)"/></svg>
+        <h3>Specimen D — Threads 2.0</h3>
+        <p>A creator ecosystem to out-run X. Growth loops, AARRR, OKRs — the full playbook.</p>
+        <a class="go" href="https://drive.google.com/file/d/1ARs6Fz1sjVx43HdwiOFeIplSYHQTDtc6/view" target="_blank" rel="noopener">read the case study ↗</a>
+      </article>
+      <article class="case rv" style="--rot:-0.6deg">
+        <svg class="pin" viewBox="0 0 30 34" aria-hidden="true"><ellipse cx="15" cy="30" rx="7" ry="2.6" fill="rgba(43,38,34,.18)"/><path d="M15 18 L15 29" stroke="var(--ink)" stroke-width="2"/><circle cx="15" cy="11" r="8.5" fill="var(--ink-soft)"/></svg>
+        <h3>Specimen E — Prime Video</h3>
+        <p>Tiered pricing, discovery, live sports — where the next hour of watch-time hides.</p>
+        <a class="go" href="https://drive.google.com/file/d/1xpq2jjMSSIqSQMpE5x8HPBHC-MXn8afG/view" target="_blank" rel="noopener">read the case study ↗</a>
+      </article>
+      <article class="case jar rv" style="--rot:0.7deg">
+        <h3>Still in the field</h3>
+        <p>Zomato · NoBroker — landing soon. Impatient? I respect that.</p>
+        <a class="go" href="mailto:anhadsb2@gmail.com?subject=Send%20me%20the%20Zomato%20%2F%20NoBroker%20drafts">ask for the drafts ↗</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="page pg-dots" aria-label="The shelf — design work, taped in">
+    <div class="pghead"><span><b>THE SHELF</b> — pressed &amp; taped</span><span>pg. 04</span></div>
+    <div class="h2wrap rv"><h2>Design work, end to end</h2>
+      <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true">
+        <path class="dp" d="M4 9 C 90 4, 200 13, 296 7" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <p class="rv" style="max-width:52ch">Direction and build, both mine. Evidence taped below —
+       from a fintech print-card collection to a landing section I designed, then hand-coded.</p>
+
+    <div class="shelfgrid">
+      <figure class="photo drag rv" style="--rot:-1.4deg">
+        <img src="/*ASSET:maison-blanc.jpg*/" width="760" height="949" alt="Maison Blanc — luxury print card design for a fintech brand collection" loading="lazy">
+        <figcaption>Maison Blanc — luxury print card, fintech collection. made this. still proud.</figcaption>
+      </figure>
+      <figure class="photo drag rv" style="--rot:1.1deg">
+        <img src="/*ASSET:gff-card-1.jpg*/" width="760" height="1006" alt="Card rendition — editorial dictionary concept" loading="lazy">
+        <figcaption>same collection — the dictionary concept.</figcaption>
+      </figure>
+      <figure class="photo drag rv" style="--rot:-0.8deg">
+        <img src="/*ASSET:gff-card-2.jpg*/" width="760" height="1006" alt="Card rendition — metal card concept" loading="lazy">
+        <figcaption>the metal card.</figcaption>
+      </figure>
+      <figure class="photo drag rv" style="--rot:1.5deg">
+        <img src="/*ASSET:gff-card-3.jpg*/" width="760" height="1006" alt="Card rendition — magazine cover concept" loading="lazy">
+        <figcaption>the magazine cover.</figcaption>
+      </figure>
+      <figure class="photo drag rv" style="--rot:-1.1deg">
+        <img src="/*ASSET:deck-cover.jpg*/" width="760" height="427" alt="Sales deck cover design" loading="lazy">
+        <figcaption>a sales-deck cover.</figcaption>
+      </figure>
+      <figure class="photo drag rv" style="--rot:0.9deg">
+        <img src="/*ASSET:gff-landing.jpg*/" width="760" height="541" alt="Product landing page section, designed and hand-coded" loading="lazy">
+        <figcaption>landing section — designed, then hand-coded.</figcaption>
+      </figure>
+    </div>
+
+    <div class="shelffoot rv">
+      <span class="typed">DESIGN DIRECTION + BUILD: ANHAD</span>
+      <a class="note" style="font-size:22px" href="https://anhad1409.github.io/jaano-gff-collection/" target="_blank" rel="noopener">the full card collection is live — see it ↗</a>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="page pg-dots" id="kit" aria-label="Kit — the toolkit">
+    <div class="pghead"><span><b>KIT</b> — carried daily</span><span>pg. 05</span></div>
+    <div class="h2wrap rv"><h2>Pack check</h2>
+      <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true">
+        <path class="dp" d="M4 7 C 70 13, 190 3, 296 9" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <ul class="kitlist" aria-label="Tools, each with a field note">
+      <li class="kit-item rv"><input type="checkbox" aria-label="Figma — packed">
+        <svg class="box" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M4 5 C 12 3, 21 4, 27 5 L 26 26 C 17 28, 9 27, 4 26 Z" fill="none" stroke="var(--ink)" stroke-width="2"/><path class="tick" pathLength="1" d="M6 15 L 13 23 L 27 4" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="tool">Figma</span><span class="quip">where the spec stops being words.</span></li>
+      <li class="kit-item rv"><input type="checkbox" aria-label="SQL — packed">
+        <svg class="box" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M4 5 C 12 3, 21 4, 27 5 L 26 26 C 17 28, 9 27, 4 26 Z" fill="none" stroke="var(--ink)" stroke-width="2"/><path class="tick" pathLength="1" d="M6 15 L 13 23 L 27 4" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="tool">SQL</span><span class="quip">A language that makes databases spill their secrets.</span></li>
+      <li class="kit-item rv"><input type="checkbox" aria-label="Mixpanel — packed">
+        <svg class="box" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M4 5 C 12 3, 21 4, 27 5 L 26 26 C 17 28, 9 27, 4 26 Z" fill="none" stroke="var(--ink)" stroke-width="2"/><path class="tick" pathLength="1" d="M6 15 L 13 23 L 27 4" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="tool">Mixpanel</span><span class="quip">what users did, not what they said.</span></li>
+      <li class="kit-item rv"><input type="checkbox" aria-label="Google Analytics — packed">
+        <svg class="box" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M4 5 C 12 3, 21 4, 27 5 L 26 26 C 17 28, 9 27, 4 26 Z" fill="none" stroke="var(--ink)" stroke-width="2"/><path class="tick" pathLength="1" d="M6 15 L 13 23 L 27 4" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="tool">G. Analytics</span><span class="quip">the second witness. always call two.</span></li>
+      <li class="kit-item rv"><input type="checkbox" aria-label="JIRA — packed">
+        <svg class="box" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M4 5 C 12 3, 21 4, 27 5 L 26 26 C 17 28, 9 27, 4 26 Z" fill="none" stroke="var(--ink)" stroke-width="2"/><path class="tick" pathLength="1" d="M6 15 L 13 23 L 27 4" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="tool">JIRA</span><span class="quip">certified in it. genuinely sorry.</span></li>
+      <li class="kit-item rv"><input type="checkbox" aria-label="Excel — packed">
+        <svg class="box" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M4 5 C 12 3, 21 4, 27 5 L 26 26 C 17 28, 9 27, 4 26 Z" fill="none" stroke="var(--ink)" stroke-width="2"/><path class="tick" pathLength="1" d="M6 15 L 13 23 L 27 4" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="tool">Excel</span><span class="quip">the first product I ever loved.</span></li>
+      <li class="kit-item rv"><input type="checkbox" aria-label="Claude Code — packed">
+        <svg class="box" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M4 5 C 12 3, 21 4, 27 5 L 26 26 C 17 28, 9 27, 4 26 Z" fill="none" stroke="var(--ink)" stroke-width="2"/><path class="tick" pathLength="1" d="M6 15 L 13 23 L 27 4" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="tool">Claude Code</span><span class="quip">built this notebook with me. never sighed once.</span></li>
+      <li class="kit-item rv"><input type="checkbox" aria-label="Canva — packed">
+        <svg class="box" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M4 5 C 12 3, 21 4, 27 5 L 26 26 C 17 28, 9 27, 4 26 Z" fill="none" stroke="var(--ink)" stroke-width="2"/><path class="tick" pathLength="1" d="M6 15 L 13 23 L 27 4" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="tool">Canva</span><span class="quip">for when Figma is overkill. it hurts to admit.</span></li>
+    </ul>
+    <p class="note kitfoot rv">everything above is a means. the end is a user who stops noticing the interface.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="page pg-ruled" id="margins" aria-label="Margin confessions — quirks">
+    <div class="pghead"><span><b>MARGIN CONFESSIONS</b> — written sideways, meant anyway</span><span>pg. 06</span></div>
+    <div class="rulepad">
+    <div class="marggrid">
+      <p class="conf red rv" style="--rot:-2.4deg">will redesign your slides. <span class="u">uninvited.<svg viewBox="0 0 120 12" preserveAspectRatio="none" aria-hidden="true"><path class="dp" d="M2 7 C 40 2, 80 11, 118 5" fill="none" stroke="var(--red)" stroke-width="2.6" stroke-linecap="round"/></svg></span></p>
+      <p class="conf rv" style="--rot:1.6deg">answers “why” before “when”. every time.</p>
+      <p class="conf blue rv" style="--rot:-1.2deg">every queue, menu and form is a product wearing a disguise.</p>
+      <p class="conf soft rv" style="--rot:2deg">38 open tabs. not chaos — <span class="hl">parallel discovery</span>.</p>
+      <p class="conf blue vertical rv">my work sits somewhere between logic, empathy and a few too many open tabs.</p>
+      <p class="conf rv" style="--rot:-1.8deg">product thinker by role, storyteller by instinct.</p>
+      <p class="grade rv" aria-label="A margin grade, in red pencil">A+ — see me.</p>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="page" id="reach" aria-label="Reach me — last page">
+    <div class="pghead"><span><b>LAST PAGE</b> — the important one</span><span>pg. 07</span></div>
+
+    <p class="iffound rv">IF FOUND, PLEASE<br>RETURN TO:</p>
+    <svg class="bigarrow rv" viewBox="0 0 300 120" aria-hidden="true">
+      <path class="dp" d="M18 14 C 120 10, 220 26, 236 74 C 240 88, 230 96, 214 96" fill="none" stroke="var(--red)" stroke-width="4" stroke-linecap="round" style="--dur:900ms"/>
+      <path class="dp" d="M232 82 L 213 97 L 236 104" fill="none" stroke="var(--red)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="--dur:300ms;--dd:900ms"/>
+    </svg>
+
+    <div class="contactlist">
+      <a class="rv" href="mailto:anhadsb2@gmail.com"><small>EMAIL — FASTEST</small>anhadsb2@gmail.com
+        <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true"><path class="dp" d="M2 8 C 80 3, 200 12, 298 6" fill="none" stroke="var(--blue)" stroke-width="2.6" stroke-linecap="round"/></svg></a>
+      <a class="rv" href="https://www.linkedin.com/in/anhad-singh-180925183/" target="_blank" rel="noopener"><small>LINKEDIN — OPENS NEW TAB</small>/in/anhad-singh ↗
+        <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true"><path class="dp" d="M2 7 C 100 12, 210 2, 298 8" fill="none" stroke="var(--blue)" stroke-width="2.6" stroke-linecap="round"/></svg></a>
+      <a class="rv" href="tel:+919115551310"><small>PHONE — YES, I ANSWER</small>+91 91155 51310
+        <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true"><path class="dp" d="M2 9 C 70 4, 190 11, 298 5" fill="none" stroke="var(--blue)" stroke-width="2.6" stroke-linecap="round"/></svg></a>
+    </div>
+
+    <aside class="resume tape-card rot rv" aria-label="Résumé, paperclipped to the last page">
+      <svg class="clipsvg" viewBox="0 0 26 58" aria-hidden="true">
+        <path d="M8 14 C 8 6, 20 6, 20 14 L 20 44 C 20 52, 6 52, 6 44 L 6 20 C 6 15, 14 15, 14 20 L 14 42"
+          fill="none" stroke="var(--wire)" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+      <h3>PAPERCLIPPED: ONE RÉSUMÉ</h3>
+      <p>The tidy version of everything in this notebook. Two pages, zero coffee stains.</p>
+      <a class="dl" href="{{RESUME_HREF}}" download="Anhad-Resume.pdf">take a copy — Anhad-Resume.pdf ↓</a>
+    </aside>
+
+    <div class="signoff">
+      <p class="sig rv">— Anhad<small>thanks for reading the mess before the spec.</small></p>
+      <div class="rv" style="text-align:right">
+        <span class="stamp" role="img" aria-label="Stamp: open to work">OPEN&nbsp;TO&nbsp;WORK</span>
+        <p class="typed" style="margin-top:14px">PUNJAB, INDIA · AVAILABLE WORLDWIDE</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>FIELD NOTES VOL. 1 · HAND-DRAWN, HAND-CODED — NO TEMPLATE WAS CONSULTED · © 2026 ANHAD</p>
+  </footer>
+
+</main>
+</div>
+
+<script>
+(function(){
+"use strict";
+var RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---- favicon (data URI, injected — no external requests, no static tag) ---- */
+var fav = document.createElement("link");
+fav.rel = "icon";
+fav.href = "data:image/svg+xml," + encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
+  "<rect width='64' height='64' rx='7' fill='#f6efdd'/>" +
+  "<circle cx='9' cy='14' r='3' fill='#e9dfc4' stroke='#8d8474' stroke-width='2'/>" +
+  "<circle cx='9' cy='32' r='3' fill='#e9dfc4' stroke='#8d8474' stroke-width='2'/>" +
+  "<circle cx='9' cy='50' r='3' fill='#e9dfc4' stroke='#8d8474' stroke-width='2'/>" +
+  "<path d='M20 22 C 30 12, 48 14, 52 24 C 56 36, 40 50, 26 44 C 16 40, 18 28, 30 28' " +
+  "fill='none' stroke='#c4372b' stroke-width='5' stroke-linecap='round'/></svg>");
+document.head.appendChild(fav);
+
+/* ---------- reveals ---------- */
+var rvs = [].slice.call(document.querySelectorAll(".rv"));
+if (RM || !("IntersectionObserver" in window)) {
+  rvs.forEach(function(el){ el.classList.add("on"); });
+} else {
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (e.isIntersecting){ e.target.classList.add("on"); io.unobserve(e.target); }
+    });
+  }, {threshold:.1, rootMargin:"0px 0px -36px"});
+  rvs.forEach(function(el){ io.observe(el); });
+}
+
+/* ---------- pencil draw-ons (dasharray from getTotalLength) ---------- */
+var drawSvgs = [];
+[].slice.call(document.querySelectorAll("svg")).forEach(function(svg){
+  var paths = [].slice.call(svg.querySelectorAll("path.dp"));
+  if (!paths.length) return;
+  if (RM) { svg.classList.add("go"); return; }
+  paths.forEach(function(p){
+    var L = p.getTotalLength();
+    p.style.strokeDasharray = L;
+    p.style.strokeDashoffset = L;
+  });
+  drawSvgs.push(svg);
+});
+if (drawSvgs.length){
+  var io2 = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (e.isIntersecting){ e.target.classList.add("go"); io2.unobserve(e.target); }
+    });
+  }, {threshold:.35});
+  drawSvgs.forEach(function(s){ io2.observe(s); });
+}
+/* draw-ons hidden inside a closed <details> fire on open instead */
+[].slice.call(document.querySelectorAll("details.spec")).forEach(function(d){
+  d.addEventListener("toggle", function(){
+    if (d.open) [].slice.call(d.querySelectorAll("svg")).forEach(function(s){
+      if (s.querySelector("path.dp")) s.classList.add("go");
+    });
+  });
+});
+
+/* ---------- kit auto pack-check ---------- */
+var kit = document.querySelector(".kitlist");
+if (kit){
+  var ticked = false;
+  var tick = function(){
+    if (ticked) return; ticked = true;
+    [].slice.call(kit.querySelectorAll("input")).forEach(function(inp,i){
+      setTimeout(function(){ inp.checked = true; }, RM ? 0 : 260 + i*150);
+    });
+  };
+  if (RM || !("IntersectionObserver" in window)) tick();
+  else {
+    var io3 = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting){ tick(); io3.unobserve(kit); } });
+    }, {threshold:.3});
+    io3.observe(kit);
+  }
+}
+
+/* ---------- taped things are draggable (fine pointers only) ---------- */
+if (matchMedia("(pointer: fine)").matches){
+  [].slice.call(document.querySelectorAll(".drag")).forEach(function(card){
+    var sx=0, sy=0, bx=0, by=0, on=false;
+    card.addEventListener("pointerdown", function(e){
+      if (e.button !== 0) return;
+      if (e.target.closest("a, input, summary")) return;
+      on = true; sx = e.clientX; sy = e.clientY;
+      bx = parseFloat(card.style.getPropertyValue("--dx")) || 0;
+      by = parseFloat(card.style.getPropertyValue("--dy")) || 0;
+      card.setPointerCapture(e.pointerId);
+      card.classList.add("dragging");
+    });
+    card.addEventListener("pointermove", function(e){
+      if (!on) return;
+      e.preventDefault();
+      card.style.setProperty("--dx", (bx + e.clientX - sx) + "px");
+      card.style.setProperty("--dy", (by + e.clientY - sy) + "px");
+    });
+    var end = function(e){
+      if (!on) return;
+      on = false; card.classList.remove("dragging");
+      if (card.hasPointerCapture && card.hasPointerCapture(e.pointerId))
+        card.releasePointerCapture(e.pointerId);
+    };
+    card.addEventListener("pointerup", end);
+    card.addEventListener("pointercancel", end);
+  });
+}
+
+/* ---------- index tabs: active tracking + page-flip feel ---------- */
+var tabs = [].slice.call(document.querySelectorAll(".tabs a"));
+var secs = tabs.map(function(t){ return document.querySelector(t.getAttribute("href")); });
+var setCurrent = function(id){
+  tabs.forEach(function(t){
+    if (t.getAttribute("href") === "#"+id) t.setAttribute("aria-current","true");
+    else t.removeAttribute("aria-current");
+  });
+};
+var io4 = new IntersectionObserver(function(es){
+  es.forEach(function(e){ if (e.isIntersecting) setCurrent(e.target.id); });
+}, {rootMargin:"-40% 0px -52%"});
+secs.forEach(function(s){ if (s) io4.observe(s); });
+tabs.forEach(function(t){
+  t.addEventListener("click", function(e){
+    var href = t.getAttribute("href");
+    var s = document.querySelector(href);
+    if (!s) return;
+    e.preventDefault();
+    s.scrollIntoView({behavior: RM ? "auto" : "smooth"});
+    if (history.pushState) history.pushState(null, "", href);
+    if (!s.hasAttribute("tabindex")) s.setAttribute("tabindex","-1");
+    s.focus({preventScroll:true});
+    if (!RM){
+      s.classList.remove("flip");
+      void s.offsetWidth;
+      s.classList.add("flip");
+    }
+  });
+});
+})();
+</script>

@@ -1,0 +1,89 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anhad — five portfolios, pick one</title>
+<style>
+/* ============================================================================
+   THE GALLERY — five takes on one person. Deliberately neutral chrome so the
+   versions do the talking. Gambarino + Fragment Mono.
+   ========================================================================== */
+/*FONT:Gambarino*//*FONT:Fragment Mono*/
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0d10;--panel:#131318;--chalk:#eeece6;--dim:#83848c;--hair:#232329;
+  --ease:cubic-bezier(.22,1,.36,1)}
+body{background:var(--bg);color:var(--chalk);font-family:'Gambarino',Georgia,serif;
+  min-height:100dvh;display:flex;flex-direction:column;padding:clamp(18px,4vw,52px)}
+::selection{background:#fff;color:#000}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--chalk);outline-offset:3px}
+.micro{font-family:'Fragment Mono',monospace;font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim)}
+header{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  border-bottom:1px solid var(--hair);padding-bottom:16px}
+h1{font-size:clamp(34px,6vw,72px);font-weight:400;letter-spacing:-.02em;line-height:1;
+  margin:clamp(26px,5vh,54px) 0 10px}
+.sub{font-family:'Fragment Mono',monospace;font-size:12px;line-height:1.8;color:var(--dim);
+  max-width:52ch}
+.rows{margin-top:clamp(28px,5vh,52px);border-top:1px solid var(--hair)}
+.row{display:grid;grid-template-columns:56px 1fr auto;gap:clamp(12px,2.5vw,30px);
+  align-items:center;padding:clamp(18px,2.8vh,28px) 6px;border-bottom:1px solid var(--hair);
+  transition:background .35s var(--ease),padding-left .35s var(--ease)}
+.row:hover{background:var(--panel);padding-left:16px}
+.vno{font-family:'Fragment Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em}
+.vname{font-size:clamp(20px,3vw,34px);letter-spacing:-.015em;line-height:1.1}
+.vdesc{font-family:'Fragment Mono',monospace;font-size:11px;line-height:1.7;color:var(--dim);
+  margin-top:6px;max-width:64ch}
+.pal{display:inline-flex;gap:5px;margin-left:12px;vertical-align:middle}
+.pal i{width:11px;height:11px;border-radius:50%;display:block;border:1px solid rgba(255,255,255,.14)}
+.go{font-family:'Fragment Mono',monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;border:1px solid var(--hair);border-radius:100px;padding:12px 20px;
+  white-space:nowrap;transition:all .3s var(--ease)}
+.row:hover .go{border-color:var(--chalk)}
+.note{margin-top:auto;padding-top:36px}
+@media(max-width:700px){.row{grid-template-columns:1fr;gap:8px}.go{justify-self:start}}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+
+<header>
+  <span class="micro">Anhad · portfolio versions</span>
+  <span class="micro">one gets the domain</span>
+</header>
+
+<h1>Five portfolios.<br>Same person. Pick one.</h1>
+<p class="sub">Each is a complete site with all your content — different concept, type,
+palette and interactions. Open them full-screen, live with each for a minute, then tell
+Claude which one gets finished.</p>
+
+<div class="rows">
+  <a class="row" href="/v1.html">
+    <span class="vno">V1</span>
+    <span><span class="vname">wait, why?</span><span class="pal"><i style="background:#0a0b0d"></i><i style="background:#c8ff2e"></i><i style="background:#4f7dff"></i><i style="background:#f0eee8"></i></span>
+      <span class="vdesc">Cosmic dark. Particles that organize as you scroll; your journey as film storyboards; letters that dodge the cursor.</span></span>
+    <span class="go">Open →</span>
+  </a>
+  <a class="row" href="/v2.html">
+    <span class="vno">V2</span>
+    <span><span class="vname">The Dossier</span><span class="pal"><i style="background:#d9c9a3"></i><i style="background:#211d17"></i><i style="background:#a3231d"></i><i style="background:#efe8d7"></i></span>
+      <span class="vdesc">Paper-noir case file on a curious mind. Typewriter, redaction bars, exhibits, and a verdict stamp you press yourself.</span></span>
+    <span class="go">Open →</span>
+  </a>
+  <a class="row" href="/v3.html">
+    <span class="vno">V3</span>
+    <span><span class="vname">The Signal Room</span><span class="pal"><i style="background:#04120b"></i><i style="background:#3aff9e"></i><i style="background:#ffb020"></i><i style="background:#0e2318"></i></span>
+      <span class="vdesc">A phosphor CRT control room monitoring exactly one system: you. Working command line included. Try “sudo hire”.</span></span>
+    <span class="go">Open →</span>
+  </a>
+  <a class="row" href="/v4.html">
+    <span class="vno">V4</span>
+    <span><span class="vname">The Knowing — Issue 08</span><span class="pal"><i style="background:#f4f0e6"></i><i style="background:#171512"></i><i style="background:#c8102e"></i><i style="background:#b99a45"></i></span>
+      <span class="vdesc">A print magazine profile: “The man who asks why.” Drop caps, pull quotes, reviews, plates, letters to the editor.</span></span>
+    <span class="go">Open →</span>
+  </a>
+  <a class="row" href="/v5.html">
+    <span class="vno">V5</span>
+    <span><span class="vname">Field Notes</span><span class="pal"><i style="background:#f6efdd"></i><i style="background:#2b2a26"></i><i style="background:#c94f38"></i><i style="background:#f2e04a"></i></span>
+      <span class="vdesc">Your working sketchbook: ring binding, taped photos, expedition log, margin confessions, a highlighter that follows you.</span></span>
+    <span class="go">Open →</span>
+  </a>
+</div>
+
+<p class="micro note">all five share the same facts, contacts and résumé · built &amp; screenshotted before listing</p>

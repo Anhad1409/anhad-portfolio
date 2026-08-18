@@ -1,0 +1,1026 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anhad — wait, why?</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0b0d'/%3E%3Ctext x='32' y='46' font-family='Georgia,serif' font-style='italic' font-size='44' fill='%23c8ff2e' text-anchor='middle'%3E?%3C/text%3E%3C/svg%3E">
+<style>
+/* ============================================================================
+   ANHAD — "wait, why?" · a curious mind, storyboarded
+   Chaos organizes into clarity as you scroll. Frames draw themselves.
+   Type: Cabinet Grotesk · Zodiak · Fragment Mono · Courier Prime (embedded)
+   ========================================================================== */
+/*FONT:Cabinet Grotesk*//*FONT:Zodiak*//*FONT:Fragment Mono*//*FONT:Courier Prime*/
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0a0b0d; --bg-2:#101216; --chalk:#f0eee8; --dim:#84868c; --faint:#3c3e44;
+  --hair:#212327; --lime:#c8ff2e; --blue:#4f7dff;
+  --disp:'Cabinet Grotesk',Arial,sans-serif;
+  --serif:'Zodiak',Georgia,serif;
+  --mono:'Fragment Mono',ui-monospace,monospace;
+  --hand:'Courier Prime',monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
+}
+
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--chalk);font-family:var(--disp);font-weight:400;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;background-image:var(--grain);opacity:.14;
+  pointer-events:none;z-index:9990;mix-blend-mode:overlay}
+::selection{background:var(--lime);color:#000}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--lime);outline-offset:3px;border-radius:2px}
+
+.micro{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.hand{font-family:var(--hand);font-size:13px;color:var(--dim)}
+
+/* ---------- particle field ---------- */
+#field{position:fixed;inset:0;z-index:-1;display:block}
+
+/* ---------- scroll progress ---------- */
+#prog{position:fixed;top:0;left:0;height:2px;background:var(--lime);width:0;z-index:300}
+
+/* ---------- cursor ---------- */
+#cur,#curRing{position:fixed;top:0;left:0;pointer-events:none;z-index:10000;border-radius:50%;
+  transform:translate3d(-200px,-200px,0);will-change:transform;opacity:0;transition:opacity .3s}
+#cur{width:7px;height:7px;background:var(--lime);margin:-3.5px 0 0 -3.5px}
+#curRing{width:32px;height:32px;border:1px solid rgba(240,238,232,.4);margin:-16px 0 0 -16px;
+  transition:width .35s var(--ease),height .35s var(--ease),margin .35s var(--ease),
+             border-color .35s var(--ease),opacity .3s}
+#curRing.hot{width:56px;height:56px;margin:-28px 0 0 -28px;border-color:var(--lime);
+  background:rgba(200,255,46,.07)}
+@media(hover:none),(pointer:coarse){#cur,#curRing{display:none}}
+
+/* ---------- side rail ---------- */
+#rail{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:200;
+  display:flex;flex-direction:column;gap:14px}
+#rail a{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--faint);
+  transition:color .3s var(--ease);display:flex;align-items:center;gap:8px}
+#rail a::before{content:"";width:14px;height:1px;background:currentColor;transition:width .3s var(--ease)}
+#rail a.on{color:var(--lime)}
+#rail a.on::before{width:26px}
+@media(max-width:1100px){#rail{display:none}}
+@media(min-width:1101px){.hero,section{padding-left:max(84px,6vw);padding-right:max(84px,6vw)}}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(30px);transition:opacity .95s var(--ease),transform .95s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv2{transition-delay:.12s}.rv3{transition-delay:.24s}
+
+/* ---------- shared section chrome ---------- */
+section{position:relative;padding:clamp(70px,12vh,140px) clamp(18px,5vw,72px)}
+.sec-tag{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  border-bottom:1px solid var(--hair);padding-bottom:12px;margin-bottom:clamp(30px,5vh,60px)}
+.sec-tag .no{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.14em}
+.sec-tag .lbl{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em;text-transform:uppercase}
+.sec-tag .lbl b{color:var(--lime);font-weight:400}
+
+/* ============================ 00 · HERO =================================== */
+.hero{min-height:100dvh;display:flex;flex-direction:column;padding:clamp(14px,2.6vw,30px) clamp(16px,3.5vw,48px)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.status{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--lime);animation:pulse 2.4s var(--ease) infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,255,46,.55)}70%{box-shadow:0 0 0 10px rgba(200,255,46,0)}100%{box-shadow:0 0 0 0 rgba(200,255,46,0)}}
+.crail{display:flex;gap:7px;flex-wrap:wrap}
+.crail a{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  padding:9px 14px;border:1px solid var(--hair);border-radius:100px;display:inline-flex;
+  align-items:center;gap:7px;white-space:nowrap;
+  transition:border-color .35s var(--ease),color .35s var(--ease),background .35s var(--ease)}
+.crail a:hover{border-color:var(--lime);color:var(--lime)}
+.crail a.solid{background:var(--lime);color:#000;border-color:var(--lime);font-weight:700}
+.crail a.solid:hover{background:transparent;color:var(--lime)}
+.crail svg{width:12px;height:12px;fill:currentColor;flex:0 0 auto}
+
+.hero-mid{flex:1;display:flex;flex-direction:column;justify-content:center;padding:4vh 0 2vh}
+.hero-kicker{font-family:var(--mono);font-size:clamp(10px,1.2vw,12px);letter-spacing:.24em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:1.4vh}
+.hero-kicker b{color:var(--blue);font-weight:400}
+.big-name{font-weight:800;letter-spacing:-.035em;line-height:.82;
+  font-size:clamp(88px,19.5vw,290px);color:var(--chalk);user-select:none}
+.big-name .dot{color:var(--lime)}
+.big-name .ln{display:block;overflow:hidden}
+.big-name .ln>span{display:block;transform:translateY(108%);animation:rise 1.1s var(--ease) .1s forwards}
+.big-name i{font-style:normal;display:inline-block;transition:transform .55s var(--ease)}
+@keyframes rise{to{transform:none}}
+.hero-sub{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;
+  flex-wrap:wrap;margin-top:3.5vh}
+.hero-sub p{font-family:var(--serif);font-size:clamp(16px,2vw,21px);line-height:1.45;max-width:34ch}
+.hero-sub p em{font-style:normal;color:var(--lime)}
+.scroll-cue{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--faint);
+  text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.scroll-cue i{display:block;width:1px;height:34px;background:var(--faint);position:relative;overflow:hidden}
+.scroll-cue i::after{content:"";position:absolute;left:0;top:-40%;width:100%;height:40%;
+  background:var(--lime);animation:drip 1.8s var(--ease) infinite}
+@keyframes drip{to{top:110%}}
+
+/* fast-facts strip */
+.stats{display:flex;flex-wrap:wrap;gap:8px 26px;justify-content:center;
+  border-top:1px solid var(--hair);padding:14px 0 12px}
+.stats span{font-family:var(--mono);font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--dim)}
+.stats b{color:var(--lime);font-weight:400}
+
+/* marquee */
+.marq{border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);overflow:hidden;
+  padding:13px 0;white-space:nowrap}
+.marq-in{display:inline-block;animation:marq 26s linear infinite}
+.marq span{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--dim);padding:0 22px}
+.marq span.why{color:var(--lime)}
+@keyframes marq{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.marq-in{animation:none}}
+
+/* ============================ 01 · THE QUESTION =========================== */
+.q-wrap{max-width:1060px;margin:0 auto;text-align:center}
+.q-why{font-family:var(--serif);font-weight:700;font-style:italic;
+  font-size:clamp(90px,17vw,240px);line-height:.9;letter-spacing:-.03em;
+  transform:skewX(-4deg);position:relative;display:inline-block}
+.q-why .qm{color:var(--lime)}
+.q-scrawl{position:absolute;left:4%;width:92%;bottom:-14px;height:26px;pointer-events:none}
+.q-scrawl path{fill:none;stroke:var(--blue);stroke-width:3;stroke-linecap:round}
+.in .q-scrawl path{animation:draw 1.3s var(--ease) .35s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.q-line{font-family:var(--mono);font-size:clamp(11px,1.4vw,13px);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim);margin-top:44px}
+.q-manif{font-family:var(--serif);font-size:clamp(19px,2.6vw,28px);line-height:1.55;
+  max-width:44ch;margin:26px auto 0;color:var(--chalk)}
+.q-manif b{font-weight:700;color:var(--lime)}
+.q-manif .bl{color:var(--blue)}
+.q-note{margin-top:26px}
+.note{position:absolute;width:150px;padding:14px 12px;background:#fff8c4;color:#3a3620;
+  font-family:var(--hand);font-size:12px;line-height:1.5;text-align:left;
+  transform:rotate(var(--rot,0deg));box-shadow:0 10px 26px -10px rgba(0,0,0,.55);
+  cursor:grab;user-select:none;touch-action:none;z-index:5}
+.note::before{content:"";position:absolute;top:-7px;left:50%;width:44px;height:14px;margin-left:-22px;
+  background:rgba(200,255,46,.5);transform:rotate(-2deg)}
+.note.drag{cursor:grabbing;box-shadow:0 20px 40px -12px rgba(0,0,0,.7);z-index:6}
+.q-wrap{position:relative}
+@media(max-width:760px){.note{display:none}}
+
+/* ============================ 02 · STORYBOARD ============================= */
+.sb-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;
+  margin-bottom:28px}
+.sb-head h2{font-weight:800;font-size:clamp(34px,5.6vw,64px);letter-spacing:-.03em;line-height:.95}
+.sb-head h2 span{color:var(--faint)}
+.sb-nav{display:flex;gap:8px;align-items:center}
+.rec{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:#ff5555;
+  display:inline-flex;align-items:center;gap:7px;margin-right:10px}
+.rec i{width:8px;height:8px;border-radius:50%;background:#ff5555;animation:blinkr 1.2s steps(2) infinite}
+@keyframes blinkr{50%{opacity:.15}}
+.film{height:16px;background:repeating-linear-gradient(90deg,transparent 0 14px,var(--hair) 14px 26px);
+  -webkit-mask:linear-gradient(#000,#000);margin:0 4px}
+.film.b{margin-top:-14px}
+.sb-nav button{width:46px;height:46px;border:1px solid var(--hair);border-radius:50%;
+  display:grid;place-items:center;font-size:17px;transition:all .3s var(--ease)}
+.sb-nav button:hover{border-color:var(--lime);color:var(--lime)}
+.sb-track{display:flex;gap:clamp(14px,2vw,26px);overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:8px 4px 22px;scrollbar-width:none;cursor:grab}
+.sb-track::-webkit-scrollbar{display:none}
+.sb-track.drag{cursor:grabbing;scroll-snap-type:none}
+.frame{flex:0 0 clamp(300px,64vw,560px);scroll-snap-align:start;border:1px solid var(--hair);
+  background:linear-gradient(180deg,var(--bg-2),rgba(16,18,22,.4));padding:clamp(16px,2vw,26px);
+  display:flex;flex-direction:column;gap:14px;position:relative;transition:border-color .4s var(--ease)}
+.frame:hover{border-color:#33363c}
+.frame-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.frame-top .sc{font-family:var(--hand);font-size:13px;color:var(--lime)}
+.frame-top .yr{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--faint)}
+.frame-art{border:1px dashed var(--faint);aspect-ratio:16/8.6;display:grid;place-items:center;
+  overflow:hidden;background:rgba(10,11,13,.5)}
+.frame-art svg{width:88%;height:88%}
+.frame-art path,.frame-art circle,.frame-art rect,.frame-art line,.frame-art ellipse{
+  fill:none;stroke:var(--chalk);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.frame-art .lm{stroke:var(--lime)}
+.frame-art .bl{stroke:var(--blue)}
+.frame-art .fill-lm{fill:var(--lime);stroke:none}
+.frame.in .frame-art [data-d]{animation:draw 1.4s var(--ease) forwards;animation-delay:calc(var(--i,0)*.28s)}
+.frame h3{font-weight:800;font-size:clamp(20px,2.3vw,27px);letter-spacing:-.02em}
+.frame h3 small{font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.16em;
+  color:var(--dim);display:block;margin-top:4px;text-transform:uppercase}
+.frame p{font-family:var(--serif);font-size:14.5px;line-height:1.6;color:#b9bbc0}
+.frame-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.frame-stats span{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--hair);padding:6px 10px;color:var(--dim)}
+.frame-stats span b{color:var(--lime);font-weight:400}
+.frame.next{border-style:dashed;justify-content:center;align-items:center;text-align:center;gap:18px}
+.frame.next .bigq{font-family:var(--serif);font-style:italic;font-size:64px;color:var(--faint)}
+.frame.next p{max-width:30ch}
+.frame.next a{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--lime);border:1px solid var(--lime);padding:12px 20px;border-radius:100px;
+  transition:all .3s var(--ease)}
+.frame.next a:hover{background:var(--lime);color:#000}
+.sb-hint{font-family:var(--hand);font-size:13px;color:var(--faint);margin-top:4px}
+
+/* ============================ 03 · HOW I WORK ============================= */
+.how{display:grid;gap:1px;background:var(--hair);border:1px solid var(--hair)}
+@media(min-width:860px){.how{grid-template-columns:repeat(3,1fr)}}
+.how-card{background:var(--bg);padding:clamp(22px,2.6vw,34px);display:flex;flex-direction:column;gap:16px;
+  min-height:300px;transition:background .4s var(--ease)}
+.how-card:hover{background:var(--bg-2)}
+.how-card .no{font-family:var(--mono);font-size:11px;color:var(--lime);letter-spacing:.14em}
+.how-card h3{font-weight:800;font-size:clamp(21px,2.2vw,27px);letter-spacing:-.02em}
+.how-card p{font-family:var(--serif);font-size:15px;line-height:1.6;color:#b9bbc0}
+.how-art{margin-top:auto;height:110px}
+.how-art svg{width:100%;height:100%}
+.how-art circle,.how-art path,.how-art rect{fill:none;stroke:var(--faint);stroke-width:2;stroke-linecap:round}
+.how-art .lm{stroke:var(--lime)}
+.how-art .bl{stroke:var(--blue)}
+.how-art .dotf{fill:var(--faint);stroke:none}
+.how-art .dotl{fill:var(--lime);stroke:none}
+/* discover: dashed ring spins */
+.in .ring-spin{transform-origin:center;animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* design: path draws */
+.in .how-art [data-d]{animation:draw 1.6s var(--ease) .3s forwards}
+/* deliver: pulse */
+.in .pulse-ring{transform-origin:center;animation:ping 2.2s var(--ease) infinite}
+@keyframes ping{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+
+/* ============================ 04 · THE WORK =============================== */
+.work-grid{display:grid;gap:1px;background:var(--hair);border:1px solid var(--hair)}
+@media(min-width:760px){.work-grid{grid-template-columns:1fr 1fr}}
+.wcard{background:var(--bg);padding:clamp(20px,2.6vw,32px);display:flex;flex-direction:column;gap:12px;
+  min-height:230px;position:relative;overflow:hidden;transition:background .4s var(--ease)}
+.wcard:hover{background:var(--bg-2)}
+.wcard::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .5s var(--ease);
+  background:radial-gradient(320px 320px at var(--mx,50%) var(--my,50%),rgba(200,255,46,.07),transparent 65%);
+  pointer-events:none}
+.wcard:hover::before{opacity:1}
+.wcard::after{content:"";position:absolute;inset:auto 0 0 0;height:2px;background:var(--lime);
+  transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+.wcard:hover::after{transform:scaleX(1)}
+.wcard-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.wcard-top .tag{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 9px;border:1px solid var(--hair);color:var(--dim)}
+.wcard-top .tag.day{color:var(--lime);border-color:rgba(200,255,46,.35)}
+.wcard-top .tag.soon{color:var(--blue);border-color:rgba(79,125,255,.35)}
+.wcard h3{font-weight:800;font-size:clamp(24px,3vw,36px);letter-spacing:-.025em}
+.wcard .role{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.wcard p{font-family:var(--serif);font-size:14.5px;line-height:1.6;color:#b9bbc0;max-width:46ch}
+.wcard .go{margin-top:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--lime);display:inline-flex;align-items:center;gap:8px}
+.wcard .go .arr{transition:transform .35s var(--ease);display:inline-block}
+.wcard:hover .go .arr{transform:translateX(6px)}
+.wcard .go.muted{color:var(--dim)}
+
+/* ============================ 05 · STACK ================================== */
+.stack{border-top:1px solid var(--hair)}
+.tool{display:grid;grid-template-columns:1fr;gap:4px;padding:20px 2px;border-bottom:1px solid var(--hair);
+  transition:padding-left .35s var(--ease)}
+@media(min-width:820px){.tool{grid-template-columns:280px 1fr;gap:20px;align-items:baseline}}
+.tool:hover{padding-left:12px}
+.tool h3{font-weight:800;font-size:clamp(20px,2.4vw,30px);letter-spacing:-.02em;
+  transition:color .3s var(--ease)}
+.tool:hover h3{color:var(--lime)}
+.tool p{font-family:var(--serif);font-size:15px;line-height:1.55;color:#9fa1a7}
+
+/* ============================ 06 · KNOWN QUIRKS =========================== */
+.quirks{max-width:1060px;margin:0 auto}
+.tabs-gag{border:1px solid var(--hair);background:var(--bg-2);padding:0 0 18px;margin-bottom:34px}
+.tabs-strip{display:flex;align-items:flex-end;gap:2px;overflow:hidden;padding:10px 10px 0;
+  border-bottom:1px solid var(--hair);min-height:44px}
+.tabb{flex:0 1 150px;min-width:26px;background:var(--bg);border:1px solid var(--hair);border-bottom:none;
+  border-radius:8px 8px 0 0;padding:8px 10px;font-family:var(--mono);font-size:9.5px;color:var(--dim);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:tabin .35s var(--ease)}
+.tabb.on{color:var(--lime)}
+@keyframes tabin{from{transform:translateY(12px);opacity:0}}
+.tabs-body{padding:20px 18px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.tabs-body p{font-family:var(--serif);font-size:15.5px;color:#b9bbc0}
+.tabs-body p b{color:var(--chalk)}
+.tabs-body button{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--lime);color:var(--lime);padding:11px 18px;border-radius:100px;
+  transition:all .3s var(--ease)}
+.tabs-body button:hover{background:var(--lime);color:#000}
+.tabs-count{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.1em}
+.quirk-list{display:grid;gap:1px;background:var(--hair);border:1px solid var(--hair)}
+@media(min-width:760px){.quirk-list{grid-template-columns:1fr 1fr}}
+.quirk{background:var(--bg);padding:20px 22px;font-family:var(--serif);font-size:15.5px;line-height:1.55;
+  color:#b9bbc0;display:flex;gap:12px;transition:background .35s var(--ease)}
+.quirk:hover{background:var(--bg-2)}
+.quirk::before{content:"!";font-family:var(--mono);font-size:12px;color:var(--lime);flex:0 0 auto;margin-top:2px}
+
+/* ============================ 07 · CONTACT ================================ */
+.contact{text-align:center;padding-bottom:40px}
+.contact .pre{font-family:var(--hand);font-size:14px;color:var(--dim);margin-bottom:14px}
+.contact h2{font-weight:800;letter-spacing:-.035em;line-height:.9;
+  font-size:clamp(48px,10.5vw,150px)}
+.contact h2 em{font-style:normal;color:var(--lime)}
+.contact-cta{margin-top:38px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;align-items:center}
+.cta-big{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  background:var(--lime);color:#000;font-weight:700;padding:20px 38px;border-radius:100px;
+  display:inline-block;transition:transform .3s var(--ease),background .3s var(--ease)}
+.cta-big:hover{background:#d8ff5e}
+.badges{margin-top:44px;display:flex;justify-content:center;gap:26px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.badge b{color:var(--chalk);font-weight:400;display:block;margin-top:5px}
+.foot{margin-top:60px;border-top:1px solid var(--hair);padding-top:22px;display:flex;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.12em;color:var(--faint);text-transform:uppercase}
+
+
+/* ---------- contribution sheets ---------- */
+.sheet{margin:auto;max-width:640px;width:calc(100vw - 32px);border:1px solid var(--hair);
+  background:var(--bg-2);color:var(--chalk);padding:clamp(20px,3vw,32px)}
+.sheet::backdrop{background:rgba(4,5,6,.72);backdrop-filter:blur(6px)}
+.sheet-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  border-bottom:1px solid var(--hair);padding-bottom:10px;margin-bottom:16px}
+.sheet-x{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim);padding:8px 12px;border:1px solid var(--hair);border-radius:100px;
+  transition:all .3s var(--ease)}
+.sheet-x:hover{color:var(--lime);border-color:var(--lime)}
+.sheet h3{font-weight:800;font-size:clamp(21px,2.6vw,28px);letter-spacing:-.02em}
+.sheet-lede{font-family:var(--serif);font-size:15px;line-height:1.6;color:#b9bbc0;margin-top:8px}
+.sheet-list{list-style:none;margin-top:16px;display:grid;gap:10px}
+.sheet-list li{font-family:var(--serif);font-size:14.5px;line-height:1.6;color:#b9bbc0;
+  padding-left:16px;position:relative}
+.sheet-list li::before{content:"→";position:absolute;left:0;color:var(--lime);
+  font-family:var(--mono);font-size:11px;top:3px}
+.sheet-list b{color:var(--chalk);font-weight:600}
+.sheet-nda{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--dim);
+  margin-top:18px;border-top:1px solid var(--hair);padding-top:14px;line-height:1.8}
+.sheet-nda a{color:var(--lime)}
+
+@media(pointer:coarse),(max-width:760px){
+  .crail a,.sb-nav button,.tabs-body button,.frame.next a,.cta-big,a.go{min-height:44px;
+    display:inline-flex;align-items:center;justify-content:center}
+}
+.qpop{position:fixed;z-index:9995;pointer-events:none;font-family:var(--serif);font-style:italic;
+  color:var(--lime);animation:qrise 1.2s var(--ease) forwards}
+@keyframes qrise{0%{opacity:0;transform:translateY(6px) scale(.6)}20%{opacity:.95}
+  100%{opacity:0;transform:translateY(-70px) scale(1.15) rotate(8deg)}}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}
+  .rv{opacity:1;transform:none}
+  .big-name .ln>span{transform:none}
+  .frame-art [data-d],.how-art [data-d]{stroke-dashoffset:0!important}
+  .q-scrawl path{stroke-dashoffset:0!important}
+}
+</style>
+<noscript><style>.rv{opacity:1;transform:none}</style></noscript>
+
+<canvas id="field" aria-hidden="true"></canvas>
+<div id="prog" aria-hidden="true"></div>
+<div id="cur" aria-hidden="true"></div>
+<div id="curRing" aria-hidden="true"></div>
+
+<nav id="rail" aria-label="Sections">
+  <a href="#top" data-sec="hero">00</a>
+  <a href="#why" data-sec="why">01</a>
+  <a href="#story" data-sec="story">02</a>
+  <a href="#how" data-sec="how">03</a>
+  <a href="#work" data-sec="work">04</a>
+  <a href="#stack" data-sec="stack">05</a>
+  <a href="#quirks" data-sec="quirks">06</a>
+  <a href="#contact" data-sec="contact">07</a>
+</nav>
+
+<!-- ============================ 00 · HERO ================================= -->
+<header class="hero" id="top" data-field="chaos">
+  <div class="topbar">
+    <span class="status"><i></i> Open to work · Gurugram, India</span>
+    <nav class="crail" aria-label="Contact">
+      <a href="https://www.linkedin.com/in/anhad-singh-180925183/" target="_blank" rel="noopener" data-mag><svg viewBox="0 0 24 24"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.5c0-1.31-.03-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9V21H9z"/></svg>LinkedIn</a>
+      <a href="mailto:anhadsb2@gmail.com" data-mag><svg viewBox="0 0 24 24"><path d="M2 5h20v14H2zm2 2v.4l8 5 8-5V7H4zm16 10v-7.2l-8 5-8-5V17z"/></svg>Email</a>
+      <a href="tel:+919115551310" data-mag><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .7-.2 1z"/></svg>Call</a>
+      <a class="solid" href="{{RESUME_HREF}}" download="Anhad-Resume.pdf" data-mag><svg viewBox="0 0 24 24"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 17.4l-4.7-4.7 1.4-1.4 3.3 3.3V3zM4 19h16v2H4z"/></svg>Résumé</a>
+    </nav>
+  </div>
+
+  <div class="hero-mid">
+    <p class="hero-kicker">Product manager · design accomplice · <b>certified AI-first PM</b></p>
+    <h1 class="big-name" id="bigName"><span class="ln"><span><i>A</i><i>N</i><i>H</i><i>A</i><i>D</i><i class="dot">.</i></span></span></h1>
+    <div class="hero-sub">
+      <p>Professional asker of <em>“wait, why?”</em> Currently making regulated fintech feel human at a Zerodha-backed startup.</p>
+      <p class="hand" id="liveLine" style="margin-top:10px"></p>
+      <span class="scroll-cue">scroll<i></i>the story</span>
+    </div>
+  </div>
+
+  <div class="stats" aria-label="Fast facts">
+    <span><b>2+ yrs</b> product</span><span><b>+78%</b> YoY revenue</span>
+    <span><b>14→40+</b> listings</span><span><b>3</b> verification models</span>
+    <span><b>60%</b> faster resolution</span><span><b>5</b> public case studies</span>
+  </div>
+  <div class="marq" aria-hidden="true"><div class="marq-in" id="marq">
+    <span>Product strategy</span><span>·</span><span>UI/UX</span><span>·</span><span>Video KYC</span><span>·</span>
+    <span>Voice AI</span><span>·</span><span>Growth</span><span>·</span><span>Storytelling</span><span>·</span>
+    <span class="why">wait, why?</span><span>·</span>
+  </div></div>
+</header>
+
+<!-- ============================ 01 · THE QUESTION ========================= -->
+<section id="why" data-field="word">
+  <div class="sec-tag"><span class="no">01</span><span class="lbl">//<b>the question</b></span><span class="no">·</span></div>
+  <div class="q-wrap rv">
+    <div class="q-why" id="whyBtn" role="button" tabindex="0" title="go on, ask it">why<span class="qm">?</span>
+      <svg class="q-scrawl" viewBox="0 0 400 26" preserveAspectRatio="none" aria-hidden="true">
+        <path data-d d="M6 18c70-12 128-14 196-7 40 4 96 6 192-9"/></svg>
+    </div>
+    <p class="q-line" id="whyAnswer">the entire operating system, in one word. click it — it answers.</p>
+    <p class="q-manif rv rv2">Making sense of chaos, one <b>“wait, why?”</b> at a time.
+      Product thinker by role, <span class="bl">storyteller by instinct</span>. I design clarity into products,
+      processes and people’s experience. My work sits somewhere between logic, empathy,
+      and a few too many open tabs.</p>
+    <p class="hand q-note rv rv3">← the particles behind this page just spelled it out. keep scrolling, they get organized.</p>
+    <div class="note" data-note style="--rot:-3deg;top:8%;left:2%">interview note:<br>“asks why a lot.”<br>— everyone, always</div>
+    <div class="note" data-note style="--rot:2.5deg;bottom:-4%;right:3%">drag these.<br>curiosity is<br>moveable →</div>
+  </div>
+</section>
+
+<!-- ============================ 02 · STORYBOARD =========================== -->
+<section id="story" data-field="order">
+  <div class="sec-tag"><span class="no">02</span><span class="lbl">//<b>the storyboard</b></span><span class="no">·</span></div>
+  <div class="sb-head rv">
+    <h2>Every product is a story.<br><span>Here’s mine, board by board.</span></h2>
+    <div class="sb-nav">
+      <span class="rec" aria-hidden="true"><i></i>REC</span>
+      <button id="sbPrev" aria-label="Previous frame">←</button>
+      <button id="sbNext" aria-label="Next frame">→</button>
+    </div>
+  </div>
+
+  <div class="film" aria-hidden="true"></div>
+  <div class="sb-track" id="sbTrack">
+    <article class="frame">
+      <div class="frame-top"><span class="sc">SC.01 — “ORIGIN”</span><span class="yr">PUNJAB</span></div>
+      <div class="frame-art"><svg viewBox="0 0 520 260" aria-label="Sketch: a chai glass, loose screws and a question mark">
+        <path data-d style="--len:420;--i:0" d="M195 90 h96 l-9 96 a14 14 0 0 1-14 12 h-50 a14 14 0 0 1-14-12z"/>
+        <path data-d style="--len:160;--i:1" d="M291 104 h20 a18 18 0 0 1 0 40 h-24"/>
+        <path data-d style="--len:120;--i:2" class="bl" d="M218 74 c-8-12 8-18 0-30 M245 74 c-8-12 8-18 0-30 M272 74 c-8-12 8-18 0-30"/>
+        <circle data-d style="--len:40;--i:3" cx="150" cy="180" r="9"/>
+        <path data-d style="--len:30;--i:3" d="M150 171v-12 M156 186l10 6"/>
+        <circle data-d style="--len:40;--i:4" cx="356" cy="196" r="9"/>
+        <path data-d style="--len:30;--i:4" d="M356 187v-12 M349 202l-10 8"/>
+        <path data-d style="--len:170;--i:5" class="lm" d="M396 78 c26-20 58-2 46 24 -8 18-28 14-30 34 M412 158 v2"/>
+      </svg></div>
+      <h3>The kid with the screwdriver<small>Where the “why?” started</small></h3>
+      <p>Took things apart to see why they worked. Most of them went back together.
+        The habit stayed; the toys got bigger.</p>
+      <div class="frame-stats"><span><b>EST.</b> Punjab, India</span><span><b>STATUS</b> still curious</span></div>
+    </article>
+
+    <article class="frame">
+      <div class="frame-top"><span class="sc">SC.02 — “THE COUNTER”</span><span class="yr">2023 · CANADA</span></div>
+      <div class="frame-art"><svg viewBox="0 0 520 260" aria-label="Sketch: a storefront counter and a maple leaf">
+        <path data-d style="--len:600;--i:0" d="M96 116 h330 M110 116 v96 h300 v-96"/>
+        <path data-d style="--len:300;--i:1" d="M88 116 l30-46 h286 l30 46"/>
+        <path data-d style="--len:200;--i:2" class="bl" d="M118 70 l14 46 M162 70 l10 46 M206 70 l6 46 M250 70 l2 46 M294 70 l-2 46 M338 70 l-6 46 M382 70 l-10 46"/>
+        <path data-d style="--len:120;--i:3" d="M150 212 v-52 h70 v52"/>
+        <path data-d style="--len:220;--i:4" class="lm" d="M330 150 l7 18 16-8 -4 18 18 2 -14 12 12 12 -18 0 2 18 -14-10 -8 16 -8-16 -14 10 2-18 -18 0 12-12 -14-12 18-2 -4-18 16 8z"/>
+      </svg></div>
+      <h3>Quesada, Canada<small>Operations manager</small></h3>
+      <p>Ran ops in a new market and learned the founding lesson: every queue, menu and
+        complaint is a product wearing a disguise.</p>
+      <div class="frame-stats"><span>CX <b>+20%</b></span><span>market research · pricing</span></div>
+    </article>
+
+    <article class="frame">
+      <div class="frame-top"><span class="sc">SC.03 — “FOURTEEN ROOFS”</span><span class="yr">2024–26</span></div>
+      <div class="frame-art"><svg viewBox="0 0 520 260" aria-label="Sketch: rooftops multiplying with an arrow rising">
+        <path data-d style="--len:200;--i:0" d="M78 206 v-56 l36-30 36 30 v56z M100 206 v-30 h28 v30"/>
+        <path data-d style="--len:200;--i:1" d="M186 206 v-62 l40-34 40 34 v62z M212 206 v-34 h30 v34"/>
+        <path data-d style="--len:220;--i:2" d="M302 206 v-70 l44-38 44 38 v70z M330 206 v-38 h34 v38"/>
+        <path data-d style="--len:260;--i:3" class="lm" d="M96 130 C180 60 330 60 424 96 M424 96 l-22-4 M424 96 l-8 20"/>
+        <path data-d style="--len:60;--i:4" class="bl" d="M448 168 l0 38 M436 186 l12-12 12 12"/>
+      </svg></div>
+      <h3>Zen Den Homes<small>Growth &amp; operations lead</small></h3>
+      <p>Luxury rentals, real P&amp;L. Fourteen listings became forty-plus. Learned that pricing
+        is psychology with a spreadsheet attached.</p>
+      <div class="frame-stats"><span><b>14 → 40+</b> listings</span><span><b>+78%</b> YoY revenue</span><span><b>+30%</b> occupancy</span></div>
+    </article>
+
+    <article class="frame">
+      <div class="frame-top"><span class="sc">SC.04 — “ON THE RECORD”</span><span class="yr">2026 · GURUGRAM</span></div>
+      <div class="frame-art"><svg viewBox="0 0 520 260" aria-label="Sketch: a video call window with a verified face and a voice waveform">
+        <rect data-d style="--len:640;--i:0" x="96" y="44" width="240" height="172" rx="10"/>
+        <circle data-d style="--len:140;--i:1" cx="216" cy="118" r="34"/>
+        <path data-d style="--len:120;--i:2" d="M166 216 c8-34 92-34 100 0"/>
+        <path data-d style="--len:120;--i:3" class="lm" d="M318 66 l22-8 22 8 v22 c0 18-10 28-22 34 -12-6-22-16-22-34z"/>
+        <path data-d style="--len:40;--i:4" class="lm" d="M330 86 l8 8 16-16"/>
+        <path data-d style="--len:180;--i:5" class="bl" d="M368 150 v18 M384 138 v42 M400 128 v62 M416 144 v30 M432 152 v14 M448 146 v26"/>
+      </svg></div>
+      <h3>Blostem<small>Product · Jaano &amp; VoiceBrew</small></h3>
+      <p>Regulated fintech, made human. Jaano: video verification banks can trust.
+        VoiceBrew: voice agents that do real work. I write the spec and draw the screens.</p>
+      <div class="frame-stats"><span><b>3</b> verification models</span><span>consoles + <b>design system</b></span><span><b>0-to-1</b> features</span></div>
+    </article>
+
+    <article class="frame next">
+      <div class="frame-top" style="align-self:stretch"><span class="sc">SC.05 — “NEXT FRAME”</span><span class="yr">TBD</span></div>
+      <div class="bigq">?</div>
+      <p>This panel is deliberately blank. Your product could be what happens in it.</p>
+      <a href="mailto:anhadsb2@gmail.com?subject=SC.05%20%E2%80%94%20next%20frame">Write the scene →</a>
+    </article>
+  </div>
+  <div class="film b" aria-hidden="true"></div>
+  <p class="sb-hint">← drag, scroll, or use the arrows. like any good storyboard, it reads left to right.</p>
+</section>
+
+<!-- ============================ 03 · HOW I WORK =========================== -->
+<section id="how" data-field="order">
+  <div class="sec-tag"><span class="no">03</span><span class="lbl">//<b>how i work</b></span><span class="no">·</span></div>
+  <div class="how">
+    <div class="how-card rv">
+      <span class="no">01</span>
+      <h3>Discover &amp; analyse</h3>
+      <p>Ask why until it gets uncomfortable. Then once more. Users, data and auditors
+        all get interviewed; only one of them enjoys it.</p>
+      <div class="how-art"><svg viewBox="0 0 220 110" aria-hidden="true">
+        <circle class="dotf" cx="30" cy="34" r="3"/><circle class="dotf" cx="66" cy="78" r="3"/>
+        <circle class="dotf" cx="104" cy="26" r="3"/><circle class="dotf" cx="146" cy="84" r="3"/>
+        <circle class="dotf" cx="190" cy="40" r="3"/><circle class="dotf" cx="126" cy="58" r="3"/>
+        <circle class="dotl" cx="126" cy="58" r="4"/>
+        <circle class="lm ring-spin" cx="126" cy="58" r="18" stroke-dasharray="6 7"/>
+      </svg></div>
+    </div>
+    <div class="how-card rv rv2">
+      <span class="no">02</span>
+      <h3>Design &amp; implement</h3>
+      <p>Spec and screen in the same pair of hands. The gap between the doc and the
+        interface is where products go quietly wrong.</p>
+      <div class="how-art"><svg viewBox="0 0 220 110" aria-hidden="true">
+        <circle class="dotf" cx="24" cy="86" r="3"/><circle class="dotf" cx="78" cy="52" r="3"/>
+        <circle class="dotf" cx="136" cy="66" r="3"/><circle class="dotf" cx="196" cy="26" r="3"/>
+        <path class="bl" data-d style="--len:260" d="M24 86 C50 60 60 44 78 52 C100 62 118 76 136 66 C160 54 174 38 196 26"/>
+        <rect class="lm" data-d style="--len:80" x="186" y="16" width="20" height="20" rx="4"/>
+      </svg></div>
+    </div>
+    <div class="how-card rv rv3">
+      <span class="no">03</span>
+      <h3>Deliver &amp; monitor</h3>
+      <p>Ship, measure, argue with the data, ship again. A launch is the start of the
+        conversation, not the end of it.</p>
+      <div class="how-art"><svg viewBox="0 0 220 110" aria-hidden="true">
+        <rect x="88" y="36" width="44" height="44" rx="6"/>
+        <path class="lm" d="M100 58 l8 8 16-16"/>
+        <circle class="lm pulse-ring" cx="110" cy="58" r="34"/>
+        <circle class="bl pulse-ring" cx="110" cy="58" r="34" style="animation-delay:1.1s"/>
+      </svg></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 04 · THE WORK ============================= -->
+<section id="work" data-field="order">
+  <div class="sec-tag"><span class="no">04</span><span class="lbl">//<b>the work</b></span><span class="no">·</span></div>
+  <div class="work-grid">
+    <article class="wcard rv">
+      <div class="wcard-top"><span class="role">Video KYC · Video PD · RBI-regulated</span><span class="tag day">Day job</span></div>
+      <h3>Jaano</h3>
+      <p>Verification banks can trust and humans can finish. Three models shipped: officer-led,
+        self-serve, AI avatar-guided. Journeys, consoles and the design system under them.</p>
+      <button class="go" data-sheet="jaano">My part in it <span class="arr">→</span></button>
+    </article>
+    <article class="wcard rv rv2">
+      <div class="wcard-top"><span class="role">AI voice agents · 0-to-1</span><span class="tag day">Day job</span></div>
+      <h3>VoiceBrew</h3>
+      <p>Voice agents that do real work: collections, card activation, loan outreach.
+        Campaign scheduling and outcome-based sequencing, defined from scratch.</p>
+      <button class="go" data-sheet="vb">My part in it <span class="arr">→</span></button>
+    </article>
+    <article class="wcard rv">
+      <div class="wcard-top"><span class="role">SportsTech · growth &amp; monetisation</span><span class="tag">Case study</span></div>
+      <h3>Playo</h3>
+      <p>ARPU ₹300 → ₹1,000: dynamic pricing, women-first verified slots, gamified rewards.
+        RICE-prioritised, GTM attached.</p>
+      <a class="go" href="https://drive.google.com/file/d/1JMeBFKTOdE03ffiWhw7lwNVqb7325PWH/view" target="_blank" rel="noopener">Read the case <span class="arr">→</span></a>
+    </article>
+    <article class="wcard rv rv2">
+      <div class="wcard-top"><span class="role">Creator ecosystem · platform strategy</span><span class="tag">Case study</span></div>
+      <h3>Threads 2.0</h3>
+      <p>A creator-first growth roadmap to take on X: growth loops, AARRR funnel,
+        measurable OKRs.</p>
+      <a class="go" href="https://drive.google.com/file/d/1ARs6Fz1sjVx43HdwiOFeIplSYHQTDtc6/view" target="_blank" rel="noopener">Read the case <span class="arr">→</span></a>
+    </article>
+    <article class="wcard rv">
+      <div class="wcard-top"><span class="role">Streaming · UX &amp; monetisation</span><span class="tag">Case study</span></div>
+      <h3>Prime Video</h3>
+      <p>Tiered pricing, discovery revamp and live sports, argued from user-feedback
+        analysis and competitive benchmarking.</p>
+      <a class="go" href="https://drive.google.com/file/d/1xpq2jjMSSIqSQMpE5x8HPBHC-MXn8afG/view" target="_blank" rel="noopener">Read the case <span class="arr">→</span></a>
+    </article>
+    <article class="wcard rv rv2">
+      <div class="wcard-top"><span class="role">Two more in the vault</span><span class="tag soon">Landing soon</span></div>
+      <h3>Zomato · NoBroker</h3>
+      <p>Two more strategy deep-dives, currently being re-plated for this site.
+        Impatient? Ask and I’ll send the PDFs.</p>
+      <a class="go" href="mailto:anhadsb2@gmail.com?subject=Send%20me%20the%20Zomato%20%2F%20NoBroker%20cases">Request the PDFs <span class="arr">→</span></a>
+    </article>
+  </div>
+</section>
+
+<!-- ==================== contribution sheets (dialogs) ===================== -->
+<dialog class="sheet" id="sheet-jaano">
+  <div class="sheet-head"><span class="micro" style="color:var(--lime)">CONTRIBUTION SHEET · SC.04</span>
+    <form method="dialog"><button class="sheet-x" aria-label="Close">✕ close</button></form></div>
+  <h3>Jaano — product &amp; design owner</h3>
+  <p class="sheet-lede">RBI-regulated video verification. My job: make a compliance product
+    that banks trust and humans can actually finish.</p>
+  <ul class="sheet-list">
+    <li><b>Discovery</b> with the people who live in it: auditors, underwriters, compliance, operations.</li>
+    <li>Defined, prioritized and shipped <b>three verification models</b> — officer-led, self-serve, AI avatar-guided.</li>
+    <li>Designed the <b>customer journeys</b> and the <b>admin, agent and auditor consoles</b>, plus the design system they all run on.</li>
+    <li>Defined the <b>reporting suite</b>: one case report + eight ops reports, shaped with underwriters.</li>
+    <li>Product rules I fought for: <b>AI signals advise, a human decides</b> · no customer ever dead-ends · every checklist, language and journey is <b>tenant-configurable</b> — that configurability became the lead USP.</li>
+    <li>Wrote the <b>positioning and buyer decks</b> that took it to banks; every claim verified line-by-line against production code.</li>
+  </ul>
+  <p class="sheet-nda">Product screens live behind NDAs. The thinking doesn't. Ask me anything: <a href="mailto:anhadsb2@gmail.com?subject=Jaano%20—%20tell%20me%20more">anhadsb2@gmail.com</a></p>
+</dialog>
+
+<dialog class="sheet" id="sheet-vb">
+  <div class="sheet-head"><span class="micro" style="color:var(--lime)">CONTRIBUTION SHEET · SC.04b</span>
+    <form method="dialog"><button class="sheet-x" aria-label="Close">✕ close</button></form></div>
+  <h3>VoiceBrew — 0-to-1 features &amp; client solutions</h3>
+  <p class="sheet-lede">AI voice agents that do real work, not demos. My job: define the
+    engine and translate real client processes into it.</p>
+  <ul class="sheet-list">
+    <li>Defined <b>campaign scheduling + outcome-based sequencing</b> from scratch — event-gated campaign journeys, from first flow to build-spec.</li>
+    <li>Specced the <b>internal control plane</b>: telemetry spine, metrics catalogue, RBAC, SLOs, end-to-end call replay.</li>
+    <li>Designed <b>custom voice workflows for BFSI clients</b> — collections, card activation, welcome and loan-outreach calls — turning each client's process into call flows and lead schemas.</li>
+    <li>Rule of thumb that stuck: <b>the demo talks better than a slide ever will.</b></li>
+  </ul>
+  <p class="sheet-nda">Client names and screens stay private. The approach is all yours: <a href="mailto:anhadsb2@gmail.com?subject=VoiceBrew%20—%20tell%20me%20more">anhadsb2@gmail.com</a></p>
+</dialog>
+
+<!-- ============================ 05 · STACK ================================ -->
+<section id="stack" data-field="calm">
+  <div class="sec-tag"><span class="no">05</span><span class="lbl">//<b>stack &amp; tools</b></span><span class="no">·</span></div>
+  <div class="stack">
+    <div class="tool rv"><h3>Figma</h3><p>Where rectangles become opinions, and opinions become interfaces.</p></div>
+    <div class="tool rv"><h3>SQL</h3><p>A language that makes databases spill their secrets.</p></div>
+    <div class="tool rv"><h3>Mixpanel</h3><p>Turns raw clicks into a story. Every tap, swipe and scroll is a clue.</p></div>
+    <div class="tool rv"><h3>Google Analytics</h3><p>Tells me exactly where visitors ghosted, so I can ask them why.</p></div>
+    <div class="tool rv"><h3>JIRA</h3><p>Where good intentions go to become tickets. I keep the backlog honest.</p></div>
+    <div class="tool rv"><h3>Excel</h3><p>The world’s most successful product. I study it and use it against itself.</p></div>
+    <div class="tool rv"><h3>Claude Code</h3><p>AI pair for prototypes. It types; I ask why. This site is exhibit A.</p></div>
+    <div class="tool rv"><h3>Canva</h3><p>Drag, drop, presto: vision to visual story in minutes.</p></div>
+  </div>
+</section>
+
+<!-- ============================ 06 · KNOWN QUIRKS ========================= -->
+<section id="quirks" data-field="calm">
+  <div class="sec-tag"><span class="no">06</span><span class="lbl">//<b>known quirks</b></span><span class="no">·</span></div>
+  <div class="quirks">
+    <div class="tabs-gag rv">
+      <div class="tabs-strip" id="tabStrip">
+        <span class="tabb on">anhad — portfolio</span>
+        <span class="tabb">competitor teardown (11)</span>
+        <span class="tabb">“quick figma edit”, 3h ago</span>
+      </div>
+      <div class="tabs-body">
+        <p><b>“…and a few too many open tabs.”</b> It’s not a bug, it’s parallel discovery.</p>
+        <button id="moreTab">open one more tab</button>
+        <span class="tabs-count" id="tabCount">tabs open: 3</span>
+      </div>
+    </div>
+    <div class="quirk-list">
+      <div class="quirk rv">Will redesign your slides. Uninvited. You’ll thank me at the Q&amp;A.</div>
+      <div class="quirk rv rv2">Answers “why” before “when”. Every single time.</div>
+      <div class="quirk rv">Believes every queue, menu and form is a product wearing a disguise.</div>
+      <div class="quirk rv rv2">Files named final_v3_FINAL are a cry for help. Mine are version-controlled.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 07 · CONTACT ============================== -->
+<section id="contact" class="contact" data-field="chaos">
+  <div class="sec-tag"><span class="no">07</span><span class="lbl">//<b>the next scene</b></span><span class="no">·</span></div>
+  <p class="pre rv">every good storyboard ends with a call sheet —</p>
+  <h2 class="rv">LET’S WORK<br><em>TOGETHER.</em></h2>
+  <div class="contact-cta rv rv2">
+    <a class="cta-big" href="mailto:anhadsb2@gmail.com?subject=Let%E2%80%99s%20work%20together" data-mag>Contact now</a>
+    <nav class="crail" aria-label="Contact links">
+      <a href="https://www.linkedin.com/in/anhad-singh-180925183/" target="_blank" rel="noopener" data-mag>LinkedIn</a>
+      <a href="tel:+919115551310" data-mag>Call</a>
+      <a href="{{RESUME_HREF}}" download="Anhad-Resume.pdf" data-mag>Résumé ↓</a>
+    </nav>
+  </div>
+  <div class="badges rv rv3">
+    <span class="badge">Based in<b>Gurugram, India</b></span>
+    <span class="badge">Available<b>Worldwide</b></span>
+    <span class="badge">Certified<b>AI-first product manager</b></span>
+    <span class="badge">Educated<b>B.Com (Hons), Chitkara</b></span>
+    <span class="badge">Speaks<b>English · Hindi · Punjabi</b></span>
+  </div>
+  <div class="foot">
+    <span>© Anhad · 2026</span>
+    <span>Built with too many open tabs</span>
+    <span>Type by Indian Type Foundry</span>
+  </div>
+</section>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine   = matchMedia('(hover:hover) and (pointer:fine)').matches;
+  const $  = (s,r=document)=>r.querySelector(s);
+  const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+
+  /* ---------- real stroke lengths for draw-on animations ---------- */
+  $$('[data-d]').forEach(el=>{
+    try{ const L = el.getTotalLength();
+      el.style.strokeDasharray = L; el.style.strokeDashoffset = L; }catch(e){}
+  });
+
+  /* ---------- particle field: chaos → order → calm ---------- */
+  (function field(){
+    const c = $('#field'), ctx = c.getContext('2d');
+    let W,H,DPR, parts=[], mode='chaos', mx=-1e4, my=-1e4;
+    const N = matchMedia('(max-width:760px)').matches ? 150 : 300;
+    let wordPts = [];
+    const sampleWord = () => {
+      const o = document.createElement('canvas');
+      const ow = 900, oh = 300; o.width = ow; o.height = oh;
+      const g = o.getContext('2d');
+      g.font = '700 italic 210px Zodiak, Georgia, serif';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillStyle = '#fff'; g.fillText('WHY?', ow/2, oh/2);
+      const d = g.getImageData(0,0,ow,oh).data;
+      wordPts = [];
+      for(let y=0; y<oh; y+=7) for(let x=0; x<ow; x+=7)
+        if(d[(y*ow+x)*4+3] > 128) wordPts.push([x/ow, y/oh]);
+    };
+    const size = () => {
+      DPR = Math.min(devicePixelRatio||1, 2);
+      W = c.width = innerWidth*DPR; H = c.height = innerHeight*DPR;
+      c.style.width = innerWidth+'px'; c.style.height = innerHeight+'px';
+      grid();
+    };
+    const grid = () => {
+      const cols = Math.ceil(Math.sqrt(N*innerWidth/innerHeight));
+      const rows = Math.ceil(N/cols);
+      const gx = W/(cols+1), gy = H/(rows+1);
+      parts.forEach((p,i)=>{ p.tx = gx*(1+i%cols); p.ty = gy*(1+Math.floor(i/cols)); });
+    };
+    const wordTargets = () => {
+      if(!wordPts.length) sampleWord();
+      const scale = Math.min(W*.86, 1500*DPR), yc = H*.5, xc = W*.5;
+      const asp = 300/900;
+      parts.forEach((p,i)=>{
+        if(i < wordPts.length){
+          const [nx,ny] = wordPts[(i*7919)%wordPts.length];
+          p.wx = xc + (nx-.5)*scale; p.wy = yc + (ny-.5)*scale*asp*3;
+        } else { p.wx = (i%2? -40 : W+40); p.wy = Math.random()*H; }
+      });
+    };
+    for(let i=0;i<N;i++) parts.push({
+      x:Math.random()*innerWidth*2, y:Math.random()*innerHeight*2,
+      vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5,
+      r:(.7+Math.random()*1.5), tx:0, ty:0,
+      hue: Math.random()<.14 ? 'lime' : (Math.random()<.16 ? 'blue' : 'chalk'),
+      ph: Math.random()*6.28
+    });
+    size(); addEventListener('resize', size, {passive:true});
+    addEventListener('pointermove', e=>{ mx=e.clientX*DPR; my=e.clientY*DPR; },{passive:true});
+
+    const COL = {lime:'200,255,46', blue:'79,125,255', chalk:'240,238,232'};
+    let raf;
+    const tick = () => {
+      ctx.clearRect(0,0,W,H);
+      const t = performance.now()/1000;
+      for(const p of parts){
+        if(mode==='chaos'){
+          p.vx += Math.sin(t*.7+p.ph)*.012; p.vy += Math.cos(t*.6+p.ph*1.3)*.012;
+          p.vx *= .985; p.vy *= .985;
+          p.x += p.vx; p.y += p.vy;
+        } else if(mode==='word'){
+          p.x += ((p.wx??p.tx)-p.x)*.055; p.y += ((p.wy??p.ty)-p.y)*.055;
+        } else {
+          const k = mode==='order' ? .035 : .012;
+          p.x += (p.tx-p.x)*k; p.y += (p.ty-p.y)*k;
+          if(mode==='calm'){ p.x += Math.sin(t*.4+p.ph)*.35; p.y += Math.cos(t*.35+p.ph)*.35; }
+        }
+        // mouse repulsion
+        const dx=p.x-mx, dy=p.y-my, d2=dx*dx+dy*dy;
+        if(d2 < 22000*DPR){ const d=Math.sqrt(d2)||1, f=(150*DPR-d)/d*.06; p.x+=dx*f; p.y+=dy*f; }
+        // wrap in chaos
+        if(mode==='chaos'){
+          if(p.x<-20)p.x=W+20; if(p.x>W+20)p.x=-20;
+          if(p.y<-20)p.y=H+20; if(p.y>H+20)p.y=-20;
+        }
+        const a = p.hue==='chalk' ? .22 : .5;
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${COL[p.hue]},${a})`;
+        ctx.arc(p.x, p.y, p.r*DPR, 0, 6.283);
+        ctx.fill();
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    if(reduce){ // static faint constellation
+      mode='order'; grid(); parts.forEach(p=>{p.x=p.tx;p.y=p.ty;});
+      ctx.clearRect(0,0,W,H);
+      parts.forEach(p=>{ctx.beginPath();ctx.fillStyle=`rgba(${COL[p.hue]},.18)`;
+        ctx.arc(p.x,p.y,p.r*DPR,0,6.283);ctx.fill();});
+    } else {
+      tick();
+      document.addEventListener('visibilitychange',()=>{
+        document.hidden ? cancelAnimationFrame(raf) : tick();});
+    }
+    // section-driven mode
+    const io = new IntersectionObserver(es=>{
+      es.forEach(e=>{ if(e.isIntersecting){
+        mode = e.target.dataset.field || 'chaos';
+        if(mode==='word') wordTargets();
+      }});
+    },{rootMargin:'-42% 0px -42% 0px'});
+    $$('[data-field]').forEach(s=>io.observe(s));
+  })();
+
+  /* ---------- marquee: duplicate content for a seamless -50% loop ---------- */
+  const mq = $('#marq'); if(mq) mq.innerHTML += mq.innerHTML;
+
+  /* ---------- scroll progress ---------- */
+  const prog = $('#prog');
+  addEventListener('scroll', ()=>{
+    const h = document.documentElement;
+    prog.style.width = (h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+  }, {passive:true});
+
+  /* ---------- cursor ---------- */
+  if (fine && !reduce) {
+    const dot=$('#cur'), ring=$('#curRing'); let x=0,y=0,rx=0,ry=0;
+    addEventListener('pointermove',e=>{x=e.clientX;y=e.clientY;
+      dot.style.opacity=1;ring.style.opacity=1;
+      dot.style.transform=`translate3d(${x}px,${y}px,0)`;},{passive:true});
+    (function trail(){rx+=(x-rx)*.16;ry+=(y-ry)*.16;
+      ring.style.transform=`translate3d(${rx}px,${ry}px,0)`;requestAnimationFrame(trail);})();
+    addEventListener('pointerover',e=>ring.classList.toggle('hot',
+      !!e.target.closest('a,button,.tool,.wcard,.frame')));
+  } else { $('#cur').remove(); $('#curRing').remove(); }
+
+  /* ---------- magnetic ---------- */
+  if (fine && !reduce) $$('[data-mag]').forEach(el=>{
+    el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();
+      el.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.2}px,${(e.clientY-r.top-r.height/2)*.28}px)`;});
+    el.addEventListener('pointerleave',()=>el.style.transform='');
+  });
+
+  /* ---------- reveals + frame draw ---------- */
+  const io = new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  }),{threshold:.18});
+  $$('.rv,.frame,.how-card,.q-wrap').forEach(el=>io.observe(el));
+
+  /* ---------- rail highlight ---------- */
+  const secs = $$('[data-field]');
+  const railIO = new IntersectionObserver(es=>es.forEach(e=>{
+    if(!e.isIntersecting) return;
+    const id = e.target.id === 'top' ? 'hero' : e.target.id;
+    $$('#rail a').forEach(a=>a.classList.toggle('on',
+      a.dataset.sec === (id==='' ? 'hero' : id)));
+  }),{rootMargin:'-45% 0px -45% 0px'});
+  secs.forEach(s=>railIO.observe(s));
+
+  /* ---------- storyboard drag + arrows ---------- */
+  const track = $('#sbTrack');
+  const step = () => Math.min(600, track.clientWidth*.7);
+  $('#sbPrev').addEventListener('click',()=>track.scrollBy({left:-step(),behavior:reduce?'auto':'smooth'}));
+  $('#sbNext').addEventListener('click',()=>track.scrollBy({left: step(),behavior:reduce?'auto':'smooth'}));
+  if (fine) {
+    let down=false, sx=0, sl=0;
+    track.addEventListener('pointerdown',e=>{down=true;sx=e.clientX;sl=track.scrollLeft;
+      track.classList.add('drag');});
+    addEventListener('pointermove',e=>{if(down) track.scrollLeft = sl-(e.clientX-sx);});
+    addEventListener('pointerup',()=>{down=false;track.classList.remove('drag');});
+  }
+
+  /* ---------- tabs gag ---------- */
+  const NAMES=['roadmap_v7_realfinal.fig','“5-min” yt tutorial, paused','RBI master directions.pdf',
+    'competitor pricing sheet','that one figma comment thread','mixpanel funnel #14',
+    'chai recipe (research)','why is the build failing','linkedin: “thoughts?”','okr draft — do not open'];
+  let tn=3;
+  $('#moreTab').addEventListener('click',()=>{
+    const strip=$('#tabStrip');
+    if(tn-3 >= NAMES.length){
+      $('#tabCount').textContent='browser has crashed. memory recovered. tabs: 3';
+      $$('.tabb',strip).forEach((t,i)=>{ if(i>2) t.remove(); });
+      tn=3; return;
+    }
+    const t=document.createElement('span'); t.className='tabb';
+    t.textContent=NAMES[tn-3]; strip.appendChild(t); tn++;
+    $('#tabCount').textContent='tabs open: '+tn+(tn>9?' · this is fine':'');
+  });
+
+  /* ---------- reactive hero letters ---------- */
+  if (fine && !reduce) {
+    const letters = $$('#bigName i');
+    addEventListener('pointermove', e=>{
+      letters.forEach(l=>{
+        const r = l.getBoundingClientRect();
+        const cx = r.left+r.width/2, cy = r.top+r.height/2;
+        const dx = e.clientX-cx, dy = e.clientY-cy, d = Math.hypot(dx,dy);
+        if(d < 240){ const f = (240-d)/240*34;
+          l.style.transform = `translate(${-dx/d*f}px,${-dy/d*f}px) rotate(${-dx/d*3}deg)`;
+        } else l.style.transform = '';
+      });
+    }, {passive:true});
+  }
+
+  /* ---------- live status line ---------- */
+  const live = $('#liveLine');
+  const tickLive = () => {
+    const now = new Date(Date.now() + (330 + new Date().getTimezoneOffset())*60000);
+    const h = now.getHours();
+    const mood = h<5 ? 'probably still awake. wait, why?' : h<9 ? 'on chai no. 1.' :
+      h<13 ? 'in discovery mode.' : h<18 ? 'mid-build, tabs multiplying.' :
+      h<23 ? 'polishing something uninvited.' : 'probably still awake. wait, why?';
+    live.textContent = `it's ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})} in gurugram — ${mood}`;
+  };
+  tickLive(); setInterval(tickLive, 60000);
+
+  /* ---------- the why? dialogue ---------- */
+  const ANSW = [
+    'because “what” is easy and “why” is the job.',
+    'because users lie politely; behaviour doesn\u2019t.',
+    'because every metric is a story wearing a number.',
+    'because the auditor will ask it anyway.',
+    'because good products are just well-answered questions.',
+    'okay, now you\u2019re doing MY job. hired?',
+  ];
+  let wi = 0;
+  const whyBtn = $('#whyBtn');
+  const askWhy = () => {
+    $('#whyAnswer').textContent = ANSW[Math.min(wi, ANSW.length-1)];
+    wi++;
+    burst(whyBtn.getBoundingClientRect());
+  };
+  whyBtn.addEventListener('click', askWhy);
+  whyBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();askWhy();}});
+
+  /* ---------- floating "?" pops ---------- */
+  const pop = (x,y,size) => {
+    if(reduce) return;
+    const q = document.createElement('span');
+    q.className='qpop'; q.textContent='?';
+    q.style.left=(x-6)+'px'; q.style.top=(y-10)+'px'; q.style.fontSize=(size||18)+'px';
+    document.body.appendChild(q);
+    setTimeout(()=>q.remove(), 1300);
+  };
+  const burst = r => {
+    for(let i=0;i<8;i++) setTimeout(()=>pop(
+      r.left + Math.random()*r.width,
+      r.top + Math.random()*r.height*.6, 14+Math.random()*22), i*60);
+  };
+  let lastPop = 0;
+  addEventListener('click', e=>{
+    if(e.target.closest('a,button,.note')) return;
+    const n = Date.now(); if(n-lastPop < 300) return; lastPop = n;
+    pop(e.clientX, e.clientY, 15+Math.random()*10);
+  });
+
+  /* ---------- typed "why" egg ---------- */
+  let buf='';
+  addEventListener('keydown', e=>{
+    if(e.target.matches('input,textarea')) return;
+    buf = (buf + e.key.toLowerCase()).slice(-3);
+    if(buf==='why'){
+      for(let i=0;i<26;i++) setTimeout(()=>pop(
+        Math.random()*innerWidth, innerHeight*.25+Math.random()*innerHeight*.5,
+        12+Math.random()*30), i*45);
+      buf='';
+    }
+  });
+
+  /* ---------- draggable notes ---------- */
+  $$('[data-note]').forEach(n=>{
+    let sx,sy,ox,oy,drag=false;
+    n.addEventListener('pointerdown', e=>{
+      drag=true; n.classList.add('drag'); n.setPointerCapture(e.pointerId);
+      sx=e.clientX; sy=e.clientY;
+      const m = /translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/.exec(n.style.transform);
+      ox = m? +m[1] : 0; oy = m? +m[2] : 0;
+    });
+    n.addEventListener('pointermove', e=>{ if(drag)
+      n.style.transform = `translate(${ox+e.clientX-sx}px,${oy+e.clientY-sy}px) rotate(var(--rot))`; });
+    n.addEventListener('pointerup', ()=>{ drag=false; n.classList.remove('drag'); });
+  });
+
+  /* ---------- work card spotlight ---------- */
+  if (fine) $$('.wcard').forEach(cd=>cd.addEventListener('pointermove', e=>{
+    const r = cd.getBoundingClientRect();
+    cd.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100)+'%');
+    cd.style.setProperty('--my', ((e.clientY-r.top)/r.height*100)+'%');
+  }));
+
+  /* ---------- contribution sheets ---------- */
+  $$('[data-sheet]').forEach(btn=>btn.addEventListener('click',()=>{
+    const d = document.getElementById('sheet-'+btn.dataset.sheet);
+    d && d.showModal();
+  }));
+  $$('.sheet').forEach(d=>d.addEventListener('click',e=>{
+    const r = d.getBoundingClientRect();
+    if(e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+  }));
+
+  /* ---------- easter eggs ---------- */
+  console.log('%cwait, why are you here?','color:#c8ff2e;font-size:16px;font-family:monospace');
+  console.log('%cgood instinct. that\'s the whole job. → anhadsb2@gmail.com','color:#84868c;font-family:monospace');
+  let t0=document.title;
+  addEventListener('visibilitychange',()=>{
+    document.title = document.hidden ? 'come back, the tabs miss you' : t0;});
+})();
+</script>

@@ -1,0 +1,1059 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE KNOWING · Issue 08 — A profile of Anhad</title>
+<meta name="description" content="Issue 08 of THE KNOWING: a long-form profile of Anhad — product manager, part-time interface designer, full-time asker of inconvenient questions.">
+<style>
+/*FONT:Boska*/
+/*FONT:Sentient*/
+/*FONT:Fragment Mono*/
+
+/* ============ TOKENS ============ */
+:root{
+  /* primitive */
+  --ivory:#f4f0e6; --ivory-deep:#ece6d6; --ivory-dim:#e4ddc9;
+  --black:#221b12; --umber:#4b4335; --taupe:#756a58;
+  --scarlet:#a72b16; --scarlet-deep:#8c2110;
+  --gilt:#c5a35e; --bronze:#7c6331;
+  /* semantic */
+  --paper:var(--ivory); --paper-2:var(--ivory-deep);
+  --ink:var(--black); --ink-soft:var(--umber); --ink-faint:var(--taupe);
+  --accent:var(--scarlet); --accent-down:var(--scarlet-deep);
+  --rule:var(--gilt); --meta:var(--bronze);
+  --hairline:1px solid var(--rule);
+  --inkline:1px solid var(--ink);
+  /* type */
+  --disp:'Boska',Georgia,'Times New Roman',serif;
+  --text:'Sentient',Georgia,serif;
+  --mono:'Fragment Mono','Courier New',monospace;
+  /* space: 4px scale */
+  --s1:4px;--s2:8px;--s3:16px;--s4:24px;--s5:32px;--s6:48px;--s7:64px;--s8:96px;--s9:128px;
+  /* type ramp 1.333 on 17 */
+  --t-1:13px;--t0:15px;--t1:17px;--t2:23px;--t3:30px;--t4:40px;--t5:54px;
+  --lh:30px;
+  /* motion */
+  --dur-in:.55s; --dur-out:.22s; --ease:cubic-bezier(.22,.9,.24,1);
+  --pagew:1240px;
+}
+/* ============ RESET / BASE ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--text); font-size:var(--t1); line-height:var(--lh);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+::selection{background:var(--accent);color:var(--paper)}
+a{color:inherit}
+a:hover{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:1px}
+img,svg{max-width:100%;display:block}
+.skip{position:fixed;left:var(--s2);top:-80px;z-index:99;background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:var(--t-1);padding:var(--s2) var(--s3);text-decoration:none}
+.skip:focus-visible{top:var(--s2)}
+.page{max-width:var(--pagew);margin-inline:auto;padding-inline:clamp(20px,6vw,84px)}
+.mono{font-family:var(--mono);font-size:var(--t-1);letter-spacing:.06em}
+
+/* ============ REVEALS ============ */
+.rv{opacity:0;transform:translateY(14px);transition:opacity var(--dur-in) var(--ease),transform var(--dur-in) var(--ease)}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+
+/* ============ FOLIO HEADERS ============ */
+.folio{display:flex;justify-content:space-between;gap:var(--s3);align-items:baseline;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--meta);
+  border-top:var(--hairline);border-bottom:var(--hairline);
+  padding:calc(var(--s2) - 1px) 0;margin-bottom:var(--s6);text-transform:uppercase}
+.folio b{font-weight:400;color:var(--ink)}
+section{padding-block:var(--s7) var(--s8)}
+.divider{display:flex;align-items:center;gap:var(--s3);color:var(--rule)}
+.divider::before,.divider::after{content:"";flex:1;border-top:var(--hairline)}
+
+/* ============ PROGRESS FOLIO ============ */
+#pfolio{position:fixed;right:var(--s3);bottom:var(--s3);z-index:40;
+  background:var(--paper);border:var(--inkline);box-shadow:3px 3px 0 var(--ink);
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink);
+  padding:6px 10px;text-transform:uppercase;pointer-events:none;white-space:nowrap}
+#pfolio .pf-red{color:var(--accent)}
+
+/* ============ COVER ============ */
+.cover{min-height:100svh;display:flex;flex-direction:column;padding-block:var(--s5) var(--s4);position:relative}
+.masthead{text-align:center;border-bottom:3px double var(--rule);padding-bottom:var(--s3)}
+.mast-top{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
+  letter-spacing:.18em;color:var(--meta);text-transform:uppercase;margin-bottom:var(--s2)}
+.mast-name{font-family:var(--disp);font-weight:900;letter-spacing:.06em;
+  font-size:clamp(40px,7.4vw,96px);line-height:.95;text-transform:uppercase}
+.mast-line{font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--ink-soft);
+  text-transform:uppercase;margin-top:var(--s2)}
+.mast-line em{font-style:normal;color:var(--accent)}
+.cover-main{flex:1;display:grid;grid-template-columns:minmax(190px,240px) minmax(0,1fr);
+  gap:clamp(var(--s5),5vw,var(--s8));align-items:center;padding-block:var(--s6)}
+.coverlines{border-left:2px solid var(--ink);padding-left:var(--s4);display:flex;flex-direction:column;gap:var(--s4)}
+.coverlines h2{font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.2em;
+  color:var(--accent);text-transform:uppercase;margin-bottom:var(--s1)}
+.cl{display:block}
+.cl b{display:block;font-family:var(--disp);font-weight:700;font-size:var(--t3);line-height:1.05}
+.cl span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  color:var(--ink-faint);text-transform:uppercase;margin-top:2px}
+.headline-wrap{position:relative}
+h1{font-family:var(--disp);font-weight:700;font-size:clamp(46px,7.2vw,104px);
+  line-height:1.0;letter-spacing:-.015em;max-width:11ch}
+h1 .why{font-style:italic;font-weight:900;color:var(--accent);position:relative;display:inline-block}
+h1 .why svg{position:absolute;left:-2%;bottom:-.22em;width:104%;height:.36em;overflow:visible}
+.deck{font-family:var(--text);font-style:italic;font-size:var(--t2);line-height:1.45;
+  color:var(--ink-soft);max-width:52ch;margin-top:var(--s5)}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--meta);margin-bottom:var(--s3)}
+.kicker i{font-style:normal;color:var(--accent)}
+/* red cover flash */
+.flash{position:absolute;top:clamp(120px,16vh,170px);right:clamp(12px,2vw,28px);z-index:5;
+  width:118px;height:118px;border-radius:50%;background:var(--accent);color:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;line-height:1.5;text-transform:uppercase;
+  text-decoration:none;transform:rotate(8deg);
+  transition:transform var(--dur-out) var(--ease),background var(--dur-out) var(--ease)}
+.flash small{font-size:8px;letter-spacing:.05em;opacity:.85}
+.flash:hover{transform:rotate(0deg) scale(1.05);background:var(--accent-down);color:var(--paper)}
+.flash:active{transform:scale(.97)}
+@media(prefers-reduced-motion:reduce){.flash{transition:none}.flash:hover{transform:rotate(8deg)}}
+/* barcode strip */
+.cover-foot{border-top:var(--inkline);padding-top:var(--s3);display:flex;align-items:flex-end;
+  justify-content:space-between;gap:var(--s4);flex-wrap:wrap}
+.barcode{display:flex;align-items:flex-end;gap:var(--s3)}
+.bars{display:flex;align-items:stretch;height:44px;gap:0}
+.bars i{display:block;background:var(--ink)}
+.bars i.g{background:transparent}
+.bc-meta{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--ink-soft);text-transform:uppercase}
+.bc-meta b{display:block;color:var(--ink);font-weight:400}
+.price{font-family:var(--disp);font-style:italic;font-weight:700;font-size:var(--t2);text-align:right}
+.price span{display:block;font-family:var(--mono);font-style:normal;font-weight:400;font-size:10px;
+  letter-spacing:.2em;color:var(--meta);text-transform:uppercase}
+
+/* ============ CONTENTS ============ */
+.toc-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:var(--s7)}
+.toc-list{list-style:none}
+.toc-list li{border-bottom:1px dotted var(--ink-faint)}
+.toc-list a{display:flex;align-items:baseline;gap:var(--s3);text-decoration:none;
+  padding:var(--s3) var(--s1);transition:color var(--dur-out) var(--ease)}
+.toc-list a:hover .toc-t{color:var(--accent)}
+.toc-list a:hover .toc-p{color:var(--accent)}
+.toc-p{font-family:var(--mono);font-size:var(--t-1);color:var(--meta);min-width:3ch}
+.toc-t{font-family:var(--disp);font-weight:700;font-size:var(--t2);line-height:1.1}
+.toc-d{margin-left:auto;text-align:right;font-family:var(--mono);font-size:10px;
+  letter-spacing:.1em;color:var(--ink-faint);text-transform:uppercase}
+.toc-side{border-left:var(--hairline);padding-left:var(--s5);align-self:start}
+.toc-side h3,.sidebox h3{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.2em;
+  color:var(--accent);text-transform:uppercase;margin-bottom:var(--s3)}
+.toc-side p{font-size:var(--t0);line-height:1.6;color:var(--ink-soft)}
+.toc-side .mono a,.pk-line a{color:var(--ink);text-decoration-color:var(--rule);text-underline-offset:3px}
+.toc-side .mono a:hover{color:var(--accent)}
+.pk-line{margin-top:var(--s4);font-family:var(--mono);font-size:var(--t-1);letter-spacing:.06em}
+.pk-line a{text-decoration:underline}
+
+/* ============ FEATURE / PROSE ============ */
+.feature-grid{display:grid;grid-template-columns:minmax(0,1fr) 216px;gap:var(--s7)}
+.prose{column-count:2;column-gap:var(--s6);column-rule:1px solid var(--ivory-dim);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 calc(var(--lh) - 1px),rgba(34,27,18,.045) calc(var(--lh) - 1px) var(--lh));
+  background-position:0 6px}
+.prose p{margin-bottom:var(--lh)}
+.prose p:last-child{margin-bottom:0}
+.dropcap{float:left;font-family:var(--disp);font-weight:900;font-size:86px;line-height:.74;
+  padding:10px 10px 2px 0;color:var(--ink);cursor:default;
+  transition:color var(--dur-out) var(--ease),transform var(--dur-out) var(--ease)}
+.dropcap:hover{color:var(--accent);transform:rotate(-3deg)}
+@media(prefers-reduced-motion:reduce){.dropcap:hover{transform:none}}
+.mnote-ref{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--accent);
+  vertical-align:super;line-height:0;margin-left:1px}
+.margin-rail{display:flex;flex-direction:column;gap:var(--s5);align-self:start;position:sticky;top:var(--s6)}
+.mnote{border-top:var(--hairline);padding-top:var(--s2);font-size:13px;line-height:1.55;color:var(--ink-soft)}
+.mnote b{font-family:var(--mono);font-weight:400;font-size:10px;color:var(--accent);display:block;
+  letter-spacing:.14em;margin-bottom:var(--s1)}
+.pq{font-family:var(--disp);font-style:italic;font-weight:700;
+  font-size:clamp(30px,4.6vw,58px);line-height:1.08;letter-spacing:-.01em;text-align:center;
+  padding:var(--s7) 0;margin-block:var(--s5);border-top:var(--inkline);border-bottom:var(--inkline);
+  transform:scale(calc(.958 + .042*var(--sw,1)));transform-origin:center;
+  transition:transform .12s linear}
+.pq .q{color:var(--accent)}
+.pq cite{display:block;font-family:var(--mono);font-style:normal;font-weight:400;font-size:10px;
+  letter-spacing:.24em;color:var(--meta);margin-top:var(--s3);text-transform:uppercase}
+@media(prefers-reduced-motion:reduce){.pq{transform:none;transition:none}}
+.spot{margin:var(--s2) auto 0;color:var(--ink-soft)}
+.spot-cap{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink-faint);
+  text-transform:uppercase;text-align:center;margin-top:var(--s2)}
+
+/* ============ CHRONOLOGY ============ */
+.chrono-grid{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:var(--s7)}
+.chrono-intro p{font-size:var(--t0);line-height:1.65;color:var(--ink-soft);margin-top:var(--s3)}
+.chrono-head{font-family:var(--disp);font-weight:700;font-size:var(--t4);line-height:1.02;letter-spacing:-.01em}
+.timeline{list-style:none;border-left:2px solid var(--rule);padding-left:var(--s5)}
+.timeline>li{position:relative;padding-bottom:var(--s6)}
+.timeline>li:last-child{padding-bottom:0}
+.timeline>li::before{content:"";position:absolute;left:calc(-1*var(--s5) - 6px);top:9px;
+  width:10px;height:10px;background:var(--paper);border:2px solid var(--accent);border-radius:50%}
+.tl-when{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--meta);text-transform:uppercase}
+.tl-role{font-family:var(--disp);font-weight:700;font-size:var(--t3);line-height:1.1;margin:var(--s1) 0 var(--s2)}
+.tl-role i{font-weight:400;color:var(--ink-soft)}
+.tl-body{font-size:var(--t0);line-height:1.65;color:var(--ink-soft);max-width:62ch}
+.tl-stats{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);margin-top:var(--s3)}
+.tl-stats span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink);
+  border-bottom:2px solid var(--rule);padding-bottom:2px}
+.tl-stats b{color:var(--accent);font-weight:400}
+
+/* ============ REVIEWS ============ */
+.rev-note{font-family:var(--mono);font-size:11px;line-height:1.8;letter-spacing:.08em;
+  color:var(--ink-faint);max-width:68ch;margin-bottom:var(--s6)}
+.review{border-top:var(--inkline);padding:var(--s5) 0;display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:var(--s4) var(--s7);align-items:start}
+.review:last-of-type{border-bottom:var(--inkline)}
+.rev-left h3{font-family:var(--disp);font-weight:900;font-size:var(--t4);line-height:1;letter-spacing:-.01em}
+.rev-kind{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--meta);
+  text-transform:uppercase;margin-bottom:var(--s2)}
+.stars{display:flex;gap:5px;margin-top:var(--s3);color:var(--accent)}
+.stars .off{color:var(--ivory-dim)}
+.stars svg{width:17px;height:17px}
+.embargo{display:inline-block;margin-top:var(--s3);font-family:var(--mono);font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  border:1px solid var(--accent);padding:5px 9px}
+.verdict{font-family:var(--disp);font-style:italic;font-weight:700;font-size:var(--t2);
+  line-height:1.2;margin-top:var(--s3)}
+.rev-right p{font-size:var(--t0);line-height:1.65;color:var(--ink-soft)}
+.rev-meta{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink-faint);
+  text-transform:uppercase;margin-top:var(--s3)}
+.rev-cta{margin-top:var(--s4)}
+.btn{display:inline-flex;align-items:center;gap:var(--s2);font-family:var(--mono);font-size:var(--t-1);
+  letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--ink);
+  background:none;border:var(--inkline);padding:11px 18px;cursor:pointer;
+  box-shadow:3px 3px 0 var(--rule);
+  transition:box-shadow var(--dur-out) var(--ease),transform var(--dur-out) var(--ease),
+    background var(--dur-out) var(--ease),color var(--dur-out) var(--ease)}
+.btn:hover{background:var(--ink);color:var(--paper);box-shadow:5px 5px 0 var(--rule);transform:translate(-1px,-1px)}
+.btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--rule)}
+.btn.red{border-color:var(--accent);color:var(--accent);box-shadow:3px 3px 0 var(--ivory-dim)}
+.btn.red:hover{background:var(--accent);color:var(--paper)}
+@media(prefers-reduced-motion:reduce){.btn{transition:none}.btn:hover{transform:none}}
+
+/* ============ TEARSHEET DIALOGS ============ */
+dialog.tearsheet{border:none;padding:0;background:transparent;max-width:min(680px,92vw);
+  margin:auto;overflow:visible}
+dialog.tearsheet::backdrop{background:rgba(34,27,18,.55)}
+.ts-inner{background:var(--paper);border:var(--inkline);border-top:none;
+  box-shadow:6px 6px 0 rgba(34,27,18,.85);max-height:82svh;overflow-y:auto;overscroll-behavior:contain}
+.ts-tear{height:14px;background:var(--paper);
+  clip-path:polygon(0 100%,0 55%,3% 10%,6% 60%,10% 20%,14% 70%,18% 15%,22% 65%,26% 25%,30% 75%,34% 10%,38% 60%,42% 20%,46% 70%,50% 18%,54% 66%,58% 12%,62% 62%,66% 24%,70% 72%,74% 14%,78% 64%,82% 22%,86% 70%,90% 12%,94% 58%,97% 20%,100% 55%,100% 100%)}
+.ts-head{display:flex;justify-content:space-between;align-items:center;gap:var(--s3);
+  border-bottom:var(--hairline);padding:var(--s3) var(--s5)}
+.ts-head span{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--meta);text-transform:uppercase}
+.ts-close{font-family:var(--mono);font-size:11px;letter-spacing:.12em;background:none;
+  border:var(--inkline);color:var(--ink);padding:8px 12px;cursor:pointer;text-transform:uppercase;
+  transition:background var(--dur-out) var(--ease),color var(--dur-out) var(--ease)}
+.ts-close:hover{background:var(--ink);color:var(--paper)}
+.ts-body{padding:var(--s5) var(--s5) var(--s6)}
+.ts-body h3{font-family:var(--disp);font-weight:900;font-size:var(--t4);line-height:1}
+.ts-role{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--accent);
+  text-transform:uppercase;margin:var(--s2) 0 var(--s4)}
+.ts-body h4{font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.22em;
+  color:var(--meta);text-transform:uppercase;border-top:var(--hairline);
+  padding-top:var(--s3);margin:var(--s4) 0 var(--s2)}
+.ts-body p,.ts-body li{font-size:var(--t0);line-height:1.65;color:var(--ink-soft)}
+.ts-body ul{list-style:none}
+.ts-body li{padding-left:var(--s4);position:relative;margin-bottom:var(--s2)}
+.ts-body li::before{content:"—";position:absolute;left:0;color:var(--accent)}
+.ts-rule{font-family:var(--disp);font-style:italic;font-weight:700;font-size:var(--t2);
+  line-height:1.25;margin:var(--s2) 0;color:var(--ink)}
+.ts-foot{margin-top:var(--s5);border-top:var(--inkline);padding-top:var(--s3);
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink-faint)}
+.ts-foot a{color:var(--accent)}
+
+/* ============ PHOTO ESSAY ============ */
+.essay-lede{font-family:var(--text);font-style:italic;font-size:var(--t2);line-height:1.45;
+  color:var(--ink-soft);max-width:56ch;margin-bottom:var(--s7)}
+.plate{break-inside:avoid}
+.plate figure{margin:0}
+.plate img{width:100%;height:auto;border:var(--inkline);background:var(--paper-2)}
+.plate figcaption{margin-top:var(--s3);border-top:var(--hairline);padding-top:var(--s2)}
+.plate-no{font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--accent);
+  text-transform:uppercase;display:block;margin-bottom:2px}
+.plate-cap{font-size:13px;line-height:1.55;color:var(--ink-soft);font-style:italic}
+.plate-one{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:var(--s6);
+  align-items:end;margin-bottom:var(--s7)}
+.plate-one .plate-aside p{font-size:var(--t0);line-height:1.65;color:var(--ink-soft);margin-bottom:var(--s4)}
+.plate-row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);margin-bottom:var(--s7)}
+.plate-row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s5)}
+.essay-out{margin-top:var(--s6);text-align:center}
+
+/* ============ THE KIT ============ */
+.kit-list{list-style:none;column-count:2;column-gap:var(--s7)}
+.kit-list li{break-inside:avoid;display:flex;gap:var(--s4);border-bottom:1px dotted var(--ink-faint);
+  padding:var(--s4) 0}
+.kit-no{font-family:var(--mono);font-size:var(--t-1);color:var(--accent);min-width:3ch;padding-top:5px}
+.kit-name{font-family:var(--disp);font-weight:700;font-size:var(--t2);line-height:1.15}
+.kit-line{font-size:var(--t0);font-style:italic;color:var(--ink-soft);line-height:1.55;margin-top:2px}
+
+/* ============ LETTERS ============ */
+.letters-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s6) var(--s7)}
+.letter{border-top:var(--inkline);padding-top:var(--s4)}
+.letter-to{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--meta);
+  text-transform:uppercase;margin-bottom:var(--s3)}
+.letter p{font-size:var(--t0);line-height:1.65;color:var(--ink-soft)}
+.letter-sig{font-family:var(--disp);font-style:italic;font-weight:700;font-size:var(--t1);
+  text-align:right;margin-top:var(--s3)}
+.letter-ed{font-size:13px;font-style:italic;color:var(--ink-faint);margin-top:var(--s3);
+  border-left:2px solid var(--rule);padding-left:var(--s3)}
+.letter-ed b{font-style:normal;font-family:var(--mono);font-weight:400;font-size:10px;
+  letter-spacing:.14em;color:var(--accent)}
+
+/* ============ FINE PRINT ============ */
+.fine-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s6)}
+.sidebox{border-top:var(--inkline);padding-top:var(--s3)}
+.sidebox ul{list-style:none}
+.sidebox li{font-size:var(--t0);line-height:1.6;color:var(--ink-soft);margin-bottom:var(--s2)}
+.sidebox li b{font-weight:700;color:var(--ink)}
+.sidebox li i{display:block;font-style:normal;font-family:var(--mono);font-size:10px;
+  letter-spacing:.12em;color:var(--ink-faint);text-transform:uppercase}
+.fine-note{margin-top:var(--s6);display:flex;flex-wrap:wrap;gap:var(--s3) var(--s5);align-items:center}
+
+/* ============ BACK COVER ============ */
+.back{background:var(--ink);color:var(--paper);padding-block:var(--s8)}
+.back ::selection{background:var(--paper);color:var(--ink)}
+.back .folio{border-color:rgba(197,163,94,.5);color:var(--gilt)}
+.back .folio b{color:var(--paper)}
+.back-head{font-family:var(--disp);font-weight:700;font-style:italic;
+  font-size:clamp(38px,5.6vw,76px);line-height:1.04;letter-spacing:-.01em;max-width:15ch}
+.back-head a{color:var(--paper);text-decoration:underline;text-decoration-color:var(--accent);
+  text-decoration-thickness:3px;text-underline-offset:8px;transition:color var(--dur-out) var(--ease)}
+.back-head a:hover{color:var(--gilt)}
+.back-sub{font-size:var(--t0);line-height:1.65;color:rgba(244,240,230,.72);max-width:52ch;margin-top:var(--s4)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s4);margin-top:var(--s7)}
+.card{background:var(--paper);color:var(--ink);border:var(--inkline);padding:var(--s4);
+  text-decoration:none;display:flex;flex-direction:column;gap:var(--s2);min-height:118px;
+  box-shadow:4px 4px 0 rgba(197,163,94,.55);
+  transition:transform var(--dur-out) var(--ease),box-shadow var(--dur-out) var(--ease)}
+.card:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 rgba(197,163,94,.75);color:var(--ink)}
+.card:active{transform:translate(1px,1px);box-shadow:2px 2px 0 rgba(197,163,94,.55)}
+@media(prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+.card b{font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.2em;
+  color:var(--accent);text-transform:uppercase}
+.card span{font-family:var(--disp);font-weight:700;font-size:var(--t1);line-height:1.3;word-break:break-word}
+.card i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink-faint);
+  letter-spacing:.08em;margin-top:auto;text-transform:uppercase}
+.card.presskit{background:var(--accent);color:var(--paper)}
+.card.presskit b{color:var(--paper)}
+.card.presskit i{color:rgba(244,240,230,.75)}
+.card.presskit:hover{color:var(--paper)}
+.back-foot{margin-top:var(--s8);border-top:1px solid rgba(197,163,94,.5);padding-top:var(--s4);
+  display:flex;justify-content:space-between;align-items:flex-end;gap:var(--s5);flex-wrap:wrap}
+.back-foot .bars i:not(.g){background:var(--paper)}
+.back-foot .bc-meta{color:rgba(244,240,230,.6)}
+.back-foot .bc-meta b{color:var(--paper)}
+.back-colophon{font-family:var(--mono);font-size:10px;letter-spacing:.14em;line-height:2;
+  color:rgba(244,240,230,.55);text-transform:uppercase;text-align:right}
+.back-colophon a{color:var(--gilt)}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:1020px){
+  .feature-grid,.chrono-grid,.toc-grid{grid-template-columns:minmax(0,1fr)}
+  .margin-rail{position:static;border-top:var(--inkline);padding-top:var(--s4);
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4)}
+  .toc-side{border-left:none;border-top:var(--hairline);padding-left:0;padding-top:var(--s4)}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .plate-row3{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  section{padding-block:var(--s6) var(--s7)}
+  .prose{column-count:1}
+  .kit-list{column-count:1}
+  .cover-main{grid-template-columns:minmax(0,1fr);gap:var(--s6);align-content:start}
+  .coverlines{order:2;flex-direction:column}
+  .headline-wrap{order:1;padding-top:var(--s6)}
+  .flash{position:static;width:96px;height:96px;font-size:10px;
+    margin:var(--s4) var(--s2) calc(-1*var(--s5)) auto;transform:rotate(6deg)}
+  .flash:hover{transform:rotate(6deg)}
+  .review{grid-template-columns:minmax(0,1fr)}
+  .letters-grid,.plate-row2,.plate-row3,.fine-grid{grid-template-columns:minmax(0,1fr)}
+  .plate-one{grid-template-columns:minmax(0,1fr)}
+  .cards{grid-template-columns:minmax(0,1fr)}
+  .back-colophon{text-align:left}
+  .mast-top span:nth-child(2){display:none}
+  .folio{font-size:10px;letter-spacing:.08em;gap:var(--s1) var(--s2);flex-wrap:wrap}
+  .folio .iss{display:none}
+  .folio>span{white-space:nowrap}
+  .folio>span:last-child{margin-left:auto}
+  #pfolio{right:var(--s2);bottom:var(--s2)}
+  .toc-list a,.btn,.card,.ts-close,.flash{min-height:44px}
+  .toc-d{display:none}
+}
+@media(pointer:coarse){
+  .btn,.ts-close,.card,.flash,.toc-list a{min-height:44px}
+  .dropcap:hover{transform:none;color:var(--ink)}
+}
+</style>
+
+<a class="skip" href="#main">Skip to the feature</a>
+
+<div id="pfolio" aria-hidden="true">THE KNOWING · <span class="pf-red" id="pf-page">COVER</span></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="star" viewBox="0 0 20 20">
+      <path d="M10 1.6 12.5 7.3 18.7 7.9 14 12 15.4 18.1 10 14.9 4.6 18.1 6 12 1.3 7.9 7.5 7.3Z"
+        fill="currentColor" stroke="currentColor" stroke-width=".8" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============================== COVER · PAGE 01 ============================== -->
+<header class="page cover" id="cover">
+  <div class="masthead">
+    <div class="mast-top">
+      <span>Issue 08 · August 2026</span>
+      <span>A magazine of one subject</span>
+      <span>Punjab · Worldwide</span>
+    </div>
+    <p class="mast-name">The Knowing</p>
+    <p class="mast-line">Founded in a room with too many open tabs · <em>Single-reader edition</em></p>
+  </div>
+
+  <a class="flash" href="#back">Open<br>to work<small>see back cover</small></a>
+
+  <div class="cover-main">
+    <aside class="coverlines rv" aria-label="In numbers — the fast scan">
+      <h2>In numbers</h2>
+      <span class="cl"><b>2+ yrs</b><span>in product</span></span>
+      <span class="cl"><b>+78%</b><span>YoY revenue, Zen Den</span></span>
+      <span class="cl"><b>14→40+</b><span>listings scaled</span></span>
+      <span class="cl"><b>3</b><span>verification models shipped</span></span>
+      <span class="cl"><b>60%</b><span>faster resolution cycles</span></span>
+      <span class="cl"><b>5</b><span>public case studies</span></span>
+    </aside>
+
+    <div class="headline-wrap rv">
+      <p class="kicker">The profile · <i>Anhad</i> · product manager who designs what he specs</p>
+      <h1>The man who asks <span class="why">why.<svg viewBox="0 0 120 14" preserveAspectRatio="none" aria-hidden="true"><path d="M2 6 C 30 1, 70 10, 118 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M6 11 C 40 7, 80 13, 114 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span></h1>
+      <p class="deck">Making sense of chaos, one “wait, why?” at a time — a certified AI-first PM
+        whose work sits somewhere between logic, empathy and a few too many open tabs.</p>
+    </div>
+  </div>
+
+  <div class="cover-foot">
+    <div class="barcode" aria-hidden="true">
+      <div class="bars" id="bars"></div>
+      <p class="bc-meta"><b>8 080826 140908</b>printed on curiosity</p>
+    </div>
+    <p class="price"><span>Cover price</span>One coffee</p>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============================== CONTENTS · PAGE 02 ============================== -->
+<section class="page" id="contents" data-page="02" data-name="Contents" aria-label="In this issue">
+  <div class="folio"><span><b>The Knowing</b><span class="iss"> · Issue 08</span> · Page 02</span><span>In this issue</span></div>
+  <div class="toc-grid">
+    <nav aria-label="Contents">
+      <ol class="toc-list">
+        <li><a href="#feature"><span class="toc-p">03</span><span class="toc-t">The Profile</span><span class="toc-d">Long read · from Punjab to fintech infra</span></a></li>
+        <li><a href="#chronology"><span class="toc-p">05</span><span class="toc-t">A Chronology</span><span class="toc-d">Four chapters, chronological</span></a></li>
+        <li><a href="#reviews"><span class="toc-p">06</span><span class="toc-t">Reviews</span><span class="toc-d">The work, starred</span></a></li>
+        <li><a href="#plates"><span class="toc-p">08</span><span class="toc-t">The Photo Essay</span><span class="toc-d">Plates I–VI · pure design work</span></a></li>
+        <li><a href="#kit"><span class="toc-p">10</span><span class="toc-t">The Kit</span><span class="toc-d">Eight tools, annotated</span></a></li>
+        <li><a href="#letters"><span class="toc-p">11</span><span class="toc-t">Letters to the Editor</span><span class="toc-d">Complaints, mostly fair</span></a></li>
+        <li><a href="#fineprint"><span class="toc-p">12</span><span class="toc-t">The Fine Print</span><span class="toc-d">Credentials · languages</span></a></li>
+        <li><a href="#back"><span class="toc-p">—</span><span class="toc-t">Back Cover</span><span class="toc-d">Subscribe · contact · press kit</span></a></li>
+      </ol>
+    </nav>
+    <aside class="toc-side rv">
+      <h3>From the editor</h3>
+      <p>This issue profiles exactly one person: a product manager in Punjab, available worldwide,
+        who owns product <em>and</em> design and treats every queue, menu and form as a product
+        wearing a disguise. He is, at press time, open to work.</p>
+      <p class="pk-line">Reach the subject directly:<br>
+        <a href="mailto:anhadsb2@gmail.com">anhadsb2@gmail.com</a> ·
+        <a href="tel:+919115551310">+91 91155 51310</a><br>
+        <a href="https://www.linkedin.com/in/anhad-singh-180925183/" target="_blank" rel="noopener">LinkedIn ↗</a> ·
+        <a href="{{RESUME_HREF}}" download="Anhad-Resume.pdf">Press kit (PDF) ↓</a></p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================== FEATURE · PAGE 03 ============================== -->
+<section class="page" id="feature" data-page="03" data-name="The Profile">
+  <div class="folio"><span><b>The Knowing</b><span class="iss"> · Issue 08</span> · Page 03</span><span>The profile</span></div>
+  <div class="feature-grid">
+    <div>
+      <div class="prose rv">
+        <p><span class="dropcap" aria-hidden="true">T</span>here is a species of child who receives a
+          working radio and, within the hour, presents the family with a tray of parts. Anhad was that
+          child, in Punjab, and the radios never fully recovered. The habit was not destruction; it was
+          an early form of due diligence.<i class="mnote-ref">[1]</i> Things worked, and that was
+          precisely the problem — <em>why</em> did they work? Nobody would say. The screwdriver would.</p>
+        <p>The adult version of this habit is called product management, and it took a detour to get
+          there. In January 2023 he surfaced in Canada, running operations for Quesada — brand strategy
+          with executive leadership in a market he had never lived in, monthly market research,
+          competitive benchmarking, and a rebuild of the customer-experience processes that moved
+          satisfaction indicators up twenty percent. The lesson he kept: a till queue is a funnel, and
+          funnels can be redesigned.<i class="mnote-ref">[2]</i></p>
+        <p>Then came Zen Den Homes, luxury short-term rentals, where he ran growth and operations for
+          two years and the numbers stopped being polite. Fourteen listings became forty-plus. Revenue
+          rose seventy-eight percent year on year. Dynamic pricing lifted occupancy thirty percent. He
+          wrote the onboarding workflow and the SOPs himself — ramp-up got thirty percent faster, issue
+          resolution sixty percent faster — because the fastest way to fix an operation is to treat it
+          as an unshipped product.</p>
+        <p>Since May 2026 he has been at Blostem, a Zerodha-Rainmatter-backed B2B fintech
+          infrastructure company, where his title says product and his output says product <em>and</em>
+          design. He owns both for Jaano — RBI-compliant video KYC and video personal discussion, three
+          verification models shipped: officer-led, self-serve, and AI avatar-guided — for which he
+          designed the customer journeys, the admin, agent and auditor consoles, and the design system
+          they all run on.<i class="mnote-ref">[3]</i> And for VoiceBrew, AI voice agents for banks and
+          lenders, he took campaign scheduling and outcome-based sequencing from zero to one and turned
+          each client's collections, card-activation and loan-outreach processes into call flows a
+          machine can follow and a human can defend.</p>
+        <p>Ask him for the philosophy and you get one sentence, delivered like a house rule — the same
+          rule that governs every AI feature he ships. It is the radio child, grown up: the machine may
+          be clever, but somebody still has to hold the screwdriver.</p>
+      </div>
+
+      <blockquote class="pq rv" data-sw>
+        <p>“AI signals <span class="q">advise</span>, a human <span class="q">decides</span>.”</p>
+        <cite>House rule · applied to every model he ships</cite>
+      </blockquote>
+    </div>
+
+    <aside class="margin-rail" aria-label="Margin notes">
+      <div class="mnote rv"><b>[1] Margin note</b>Due diligence, age seven: unscrew first, apologise later.
+        The tray of parts was always labelled.</div>
+      <div class="mnote rv"><b>[2] Field observation</b>He still audits queues. Restaurants, banks,
+        airport security — all funnels, all fixable, none of them asking to be.</div>
+      <div class="mnote rv"><b>[3] Disclosure</b>“Certified AI-first PM” is a real certification
+        (Airtribe), not a personality claim. The personality came first.</div>
+      <div class="mnote rv" aria-hidden="true">
+        <b>Fig. A</b>
+        <svg class="spot" viewBox="0 0 160 120" width="160" height="120" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+          <rect x="18" y="42" width="86" height="52" rx="6"/>
+          <circle cx="44" cy="68" r="15"/><circle cx="44" cy="68" r="9"/><circle cx="44" cy="68" r="3.5"/>
+          <line x1="70" y1="52" x2="96" y2="52"/><line x1="70" y1="60" x2="96" y2="60"/><line x1="70" y1="68" x2="96" y2="68"/>
+          <line x1="30" y1="42" x2="58" y2="12"/><circle cx="60" cy="10" r="2.5"/>
+          <circle cx="126" cy="34" r="8"/><line x1="121" y1="29" x2="131" y2="39"/>
+          <circle cx="140" cy="62" r="8"/><line x1="135" y1="67" x2="145" y2="57"/>
+          <path d="M108 60 h14" stroke-dasharray="3 4"/><path d="M108 76 h22" stroke-dasharray="3 4"/>
+          <circle cx="138" cy="92" r="6"/><circle cx="138" cy="92" r="2"/>
+        </svg>
+        <span class="spot-cap">The radio, as returned</span>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================== CHRONOLOGY · PAGE 05 ============================== -->
+<section class="page" id="chronology" data-page="05" data-name="A Chronology">
+  <div class="folio"><span><b>The Knowing</b><span class="iss"> · Issue 08</span> · Page 05</span><span>A chronology</span></div>
+  <div class="chrono-grid">
+    <div class="chrono-intro rv">
+      <h2 class="chrono-head">A chronology,<br><em>in four chapters.</em></h2>
+      <p>Compiled from the record. The subject insists the chapters are one continuous act of taking
+        things apart — the only change is what he is allowed to unscrew.</p>
+    </div>
+    <ol class="timeline">
+      <li class="rv">
+        <span class="tl-when">Chapter I · Origin · Punjab</span>
+        <h3 class="tl-role">The kid with the screwdriver</h3>
+        <p class="tl-body">Took things apart to see why they worked. Radios, clocks, arguments.
+          Reassembly rate improved with age; curiosity did not diminish.</p>
+      </li>
+      <li class="rv">
+        <span class="tl-when">Chapter II · Jan 2023 – Feb 2024 · Toronto-adjacent</span>
+        <h3 class="tl-role">Quesada, Canada <i>— Operations Manager</i></h3>
+        <p class="tl-body">Brand strategy alongside executive leadership in a brand-new market. Rebuilt
+          the customer-experience processes end to end; ran monthly market research and competitive
+          benchmarking like a beat reporter.</p>
+        <div class="tl-stats"><span>CX indicators <b>+20%</b></span><span>research cadence <b>monthly</b></span></div>
+      </li>
+      <li class="rv">
+        <span class="tl-when">Chapter III · Feb 2024 – May 2026</span>
+        <h3 class="tl-role">Zen Den Homes <i>— Growth &amp; Operations Lead</i></h3>
+        <p class="tl-body">Luxury short-term rentals, scaled like software: dynamic pricing, an
+          onboarding workflow, and SOPs written the way specs should be.</p>
+        <div class="tl-stats"><span>listings <b>14 → 40+</b></span><span>revenue <b>+78% YoY</b></span>
+          <span>occupancy <b>+30%</b></span><span>ramp-up <b>30% faster</b></span><span>resolution <b>60% faster</b></span></div>
+      </li>
+      <li class="rv">
+        <span class="tl-when">Chapter IV · May 2026 – present</span>
+        <h3 class="tl-role">Blostem <i>— Product (and, quietly, Design)</i></h3>
+        <p class="tl-body">B2B fintech infrastructure, Zerodha-Rainmatter-backed. Owns product and
+          design for Jaano and VoiceBrew — reviewed on the next page, to the extent the embargo
+          permits.</p>
+        <div class="tl-stats"><span>verification models <b>3 shipped</b></span><span>consoles designed <b>3</b></span>
+          <span>products owned <b>2</b></span></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================== REVIEWS · PAGE 06 ============================== -->
+<section class="page" id="reviews" data-page="06" data-name="Reviews">
+  <div class="folio"><span><b>The Knowing</b><span class="iss"> · Issue 08</span> · Page 06</span><span>Reviews · the work</span></div>
+  <p class="rev-note">★ Ratings assigned by the subject, who insists his methodology is rigorous.
+    The critics’ desk notes he also designed the rating system. Case-study PDFs open in a new tab.</p>
+
+  <article class="review rv">
+    <div class="rev-left">
+      <p class="rev-kind">Now showing · Day job · Video KYC + Video PD</p>
+      <h3>Jaano</h3>
+      <span class="embargo">In production — press embargo</span>
+      <p class="verdict">“Three ways to verify a human; one rule about who decides.”</p>
+    </div>
+    <div class="rev-right">
+      <p>RBI-compliant video KYC and video personal discussion. Officer-led, self-serve and AI
+        avatar-guided verification, with journeys, three consoles and the design system all drawn by
+        the same hand that wrote the spec. NDA applies: no screenshots, no client names — ask him
+        about it.</p>
+      <p class="rev-meta">Blostem · product + design owner · 2026–present</p>
+      <p class="rev-cta"><button class="btn red" type="button" data-open="ts-jaano">Open the tearsheet</button></p>
+    </div>
+  </article>
+
+  <article class="review rv">
+    <div class="rev-left">
+      <p class="rev-kind">Now showing · Day job · AI voice agents</p>
+      <h3>VoiceBrew</h3>
+      <span class="embargo">In production — press embargo</span>
+      <p class="verdict">“The campaign learns to wait for the customer.”</p>
+    </div>
+    <div class="rev-right">
+      <p>Campaign scheduling and outcome-based sequencing for AI voice agents, defined from zero.
+        Collections, card activation and loan outreach for BFSI clients — each client’s process turned
+        into call flows and lead schemas. Same NDA, same invitation.</p>
+      <p class="rev-meta">Blostem · 0-to-1 feature PM + designer · 2026–present</p>
+      <p class="rev-cta"><button class="btn red" type="button" data-open="ts-voicebrew">Open the tearsheet</button></p>
+    </div>
+  </article>
+
+  <article class="review rv">
+    <div class="rev-left">
+      <p class="rev-kind">Case study · SportsTech growth</p>
+      <h3>Playo</h3>
+      <div class="stars" role="img" aria-label="Five stars out of five">
+        <svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg>
+      </div>
+      <p class="verdict">“ARPU tripled. The rest is commentary.”</p>
+    </div>
+    <div class="rev-right">
+      <p>A growth strategy for a sports-community platform that moved average revenue per user from
+        ₹300 to ₹1,000 — monetisation designed around the people who actually show up to play.</p>
+      <p class="rev-meta">Public case study · full PDF available</p>
+      <p class="rev-cta"><a class="btn" href="https://drive.google.com/file/d/1JMeBFKTOdE03ffiWhw7lwNVqb7325PWH/view" target="_blank" rel="noopener">Read the case study ↗</a></p>
+    </div>
+  </article>
+
+  <article class="review rv">
+    <div class="rev-left">
+      <p class="rev-kind">Case study · Creator ecosystem</p>
+      <h3>Threads 2.0</h3>
+      <div class="stars" role="img" aria-label="Four stars out of five">
+        <svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg class="off"><use href="#star"/></svg>
+      </div>
+      <p class="verdict">“Takes on X with growth loops instead of vibes.”</p>
+    </div>
+    <div class="rev-right">
+      <p>A creator-ecosystem strategy for Threads versus X: growth loops, the full AARRR funnel, and
+        OKRs that could survive a board meeting.</p>
+      <p class="rev-meta">Public case study · full PDF available</p>
+      <p class="rev-cta"><a class="btn" href="https://drive.google.com/file/d/1ARs6Fz1sjVx43HdwiOFeIplSYHQTDtc6/view" target="_blank" rel="noopener">Read the case study ↗</a></p>
+    </div>
+  </article>
+
+  <article class="review rv">
+    <div class="rev-left">
+      <p class="rev-kind">Case study · Streaming</p>
+      <h3>Prime Video</h3>
+      <div class="stars" role="img" aria-label="Four stars out of five">
+        <svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg class="off"><use href="#star"/></svg>
+      </div>
+      <p class="verdict">“Tiered pricing for a service everyone has but nobody chose.”</p>
+    </div>
+    <div class="rev-right">
+      <p>Tiered pricing, sharper discovery, and a live-sports play for Prime Video — a strategy for
+        turning a bundled afterthought into a deliberate subscription.</p>
+      <p class="rev-meta">Public case study · full PDF available</p>
+      <p class="rev-cta"><a class="btn" href="https://drive.google.com/file/d/1xpq2jjMSSIqSQMpE5x8HPBHC-MXn8afG/view" target="_blank" rel="noopener">Read the case study ↗</a></p>
+    </div>
+  </article>
+
+  <article class="review rv">
+    <div class="rev-left">
+      <p class="rev-kind">Coming attractions</p>
+      <h3>Zomato · NoBroker</h3>
+      <span class="embargo" style="border-color:var(--meta);color:var(--meta)">Landing soon</span>
+      <p class="verdict">“Two more industries about to be asked why.”</p>
+    </div>
+    <div class="rev-right">
+      <p>In the drafts folder and nearly ready. Impatient readers may request the PDFs directly from
+        the subject and receive them the moment they land.</p>
+      <p class="rev-meta">By request · replies personally</p>
+      <p class="rev-cta"><a class="btn" href="mailto:anhadsb2@gmail.com?subject=Send%20me%20the%20Zomato%20%2F%20NoBroker%20case%20studies">Request the PDFs</a></p>
+    </div>
+  </article>
+</section>
+
+<!-- ============================== PHOTO ESSAY · PAGE 08 ============================== -->
+<section class="page" id="plates" data-page="08" data-name="The Photo Essay">
+  <div class="folio"><span><b>The Knowing</b><span class="iss"> · Issue 08</span> · Page 08</span><span>The photo essay</span></div>
+  <p class="essay-lede rv">He also just… designs. No brief, no committee. What follows is pure visual
+    work — print cards, a deck cover, a landing page — art-directed and built end to end by the
+    subject. Museum rules apply: look closely, captions matter.</p>
+
+  <div class="plate-one">
+    <div class="plate rv">
+      <figure>
+        <img src="/*ASSET:maison-blanc.jpg*/" alt="Maison Blanc — an ivory luxury print card design for a fintech brand collection" width="760" height="949">
+        <figcaption><span class="plate-no">Plate I · Maison Blanc</span>
+          <span class="plate-cap">Luxury print card for a fintech brand collection. Design direction and build: Anhad.</span></figcaption>
+      </figure>
+    </div>
+    <div class="plate-aside rv">
+      <h2 class="chrono-head" style="font-size:var(--t3)">Plates I–VI,<br><em>from the same hand.</em></h2>
+      <p>One brand collection, four renditions — then a sales deck and a shipped landing-page section.
+        The point of the essay: the person who writes the requirements can also hold the pen.</p>
+      <p class="mono" style="color:var(--ink-faint)">Every plate: concept → art direction → final build, one person.</p>
+    </div>
+  </div>
+
+  <div class="plate-row3">
+    <div class="plate rv">
+      <figure>
+        <img src="/*ASSET:gff-card-1.jpg*/" alt="Editorial dictionary-concept rendition of the fintech card collection" width="760" height="1006">
+        <figcaption><span class="plate-no">Plate II · The Dictionary</span>
+          <span class="plate-cap">Editorial rendition of the collection — the product, defined. Design + build: Anhad.</span></figcaption>
+      </figure>
+    </div>
+    <div class="plate rv">
+      <figure>
+        <img src="/*ASSET:gff-card-2.jpg*/" alt="Metal-card rendition of the fintech card collection" width="760" height="1006">
+        <figcaption><span class="plate-no">Plate III · The Metal Card</span>
+          <span class="plate-cap">Materials study from the same collection. Design + build: Anhad.</span></figcaption>
+      </figure>
+    </div>
+    <div class="plate rv">
+      <figure>
+        <img src="/*ASSET:gff-card-3.jpg*/" alt="Magazine-cover rendition of the fintech card collection" width="760" height="1006">
+        <figcaption><span class="plate-no">Plate IV · The Cover</span>
+          <span class="plate-cap">Magazine-cover rendition — this issue’s spiritual ancestor. Design + build: Anhad.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="plate-row2">
+    <div class="plate rv">
+      <figure>
+        <img src="/*ASSET:deck-cover.jpg*/" alt="Sales deck cover design" width="760" height="427">
+        <figcaption><span class="plate-no">Plate V · The Deck Cover</span>
+          <span class="plate-cap">Cover of a sales deck that goes to banks. Design direction + build: Anhad.</span></figcaption>
+      </figure>
+    </div>
+    <div class="plate rv">
+      <figure>
+        <img src="/*ASSET:gff-landing.jpg*/" alt="Product landing-page section, designed and hand-coded" width="760" height="541">
+        <figcaption><span class="plate-no">Plate VI · The Landing Page</span>
+          <span class="plate-cap">Product landing-page section — designed, then hand-coded. Design + build: Anhad.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <p class="essay-out rv"><a class="btn" href="https://anhad1409.github.io/jaano-gff-collection/" target="_blank" rel="noopener">See the full collection ↗</a></p>
+</section>
+
+<!-- ============================== THE KIT · PAGE 10 ============================== -->
+<section class="page" id="kit" data-page="10" data-name="The Kit">
+  <div class="folio"><span><b>The Knowing</b><span class="iss"> · Issue 08</span> · Page 10</span><span>The kit · a listicle</span></div>
+  <h2 class="chrono-head rv" style="margin-bottom:var(--s6)">Eight tools he actually opens.</h2>
+  <ol class="kit-list">
+    <li class="rv"><span class="kit-no">01</span><div><p class="kit-name">Figma</p>
+      <p class="kit-line">Where the spec and the design stop pretending to be separate documents.</p></div></li>
+    <li class="rv"><span class="kit-no">02</span><div><p class="kit-name">SQL</p>
+      <p class="kit-line">A language that makes databases spill their secrets.</p></div></li>
+    <li class="rv"><span class="kit-no">03</span><div><p class="kit-name">Mixpanel</p>
+      <p class="kit-line">For asking users what they did, instead of what they say they did.</p></div></li>
+    <li class="rv"><span class="kit-no">04</span><div><p class="kit-name">Google Analytics</p>
+      <p class="kit-line">The second witness. Testimony is cross-examined.</p></div></li>
+    <li class="rv"><span class="kit-no">05</span><div><p class="kit-name">JIRA</p>
+      <p class="kit-line">Where scope goes to be negotiated. Occasionally it wins.</p></div></li>
+    <li class="rv"><span class="kit-no">06</span><div><p class="kit-name">Excel</p>
+      <p class="kit-line">The first prototype and the last resort. Sometimes on the same afternoon.</p></div></li>
+    <li class="rv"><span class="kit-no">07</span><div><p class="kit-name">Claude Code</p>
+      <p class="kit-line">A pair programmer that never asks why. That part remains his job.</p></div></li>
+    <li class="rv"><span class="kit-no">08</span><div><p class="kit-name">Canva</p>
+      <p class="kit-line">For when the deck is due in an hour and perfectionism must be scheduled.</p></div></li>
+  </ol>
+</section>
+
+<!-- ============================== LETTERS · PAGE 11 ============================== -->
+<section class="page" id="letters" data-page="11" data-name="Letters">
+  <div class="folio"><span><b>The Knowing</b><span class="iss"> · Issue 08</span> · Page 11</span><span>Letters to the editor</span></div>
+  <h2 class="chrono-head rv" style="margin-bottom:var(--s6)">The readers write.<br><em>They have complaints.</em></h2>
+  <div class="letters-grid">
+    <div class="letter rv">
+      <p class="letter-to">To the editor:</p>
+      <p>I left my slide deck unattended for eleven minutes. I returned to find kerning. Aligned
+        margins. A “suggested palette.” I did not ask for kerning. It looks better now, which I want
+        on record is not the point.</p>
+      <p class="letter-sig">— A colleague whose slides were redesigned. Uninvited.</p>
+      <p class="letter-ed"><b>Ed. —</b> The subject pleads guilty and offers to do the next one too.</p>
+    </div>
+    <div class="letter rv">
+      <p class="letter-to">To the editor:</p>
+      <p>Your subject was asked a simple scheduling question. He answered a different question — the
+        one beginning with “why” — for forty minutes. The sprint began late. It was, I concede, the
+        correct sprint.</p>
+      <p class="letter-sig">— A project timeline, still recovering</p>
+      <p class="letter-ed"><b>Ed. —</b> “Why” before “when.” Every time. The timeline knew the terms.</p>
+    </div>
+    <div class="letter rv">
+      <p class="letter-to">To the editor:</p>
+      <p>He stared at our menu for a long time and then said, softly, “this is a product wearing a
+        disguise.” He then reordered the sections, priced the anchor item, and tipped well. We are
+        told every queue and form gets this treatment.</p>
+      <p class="letter-sig">— A waiter, at a restaurant near his desk</p>
+      <p class="letter-ed"><b>Ed. —</b> The menu’s conversion rate has reportedly improved.</p>
+    </div>
+    <div class="letter rv">
+      <p class="letter-to">To the editor:</p>
+      <p>I am asked to hold forty-three tabs. When I complain, he calls it “parallel discovery” and
+        opens three more. I would like the readership to know what that actually means: forty-six
+        tabs.</p>
+      <p class="letter-sig">— His browser, memory usage withheld</p>
+      <p class="letter-ed"><b>Ed. —</b> The tabs are, in fairness, all being read. Eventually.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FINE PRINT · PAGE 12 ============================== -->
+<section class="page" id="fineprint" data-page="12" data-name="The Fine Print">
+  <div class="folio"><span><b>The Knowing</b><span class="iss"> · Issue 08</span> · Page 12</span><span>The fine print</span></div>
+  <div class="fine-grid">
+    <div class="sidebox rv">
+      <h3>Education</h3>
+      <ul><li><b>B.Com (Hons)</b><i>Chitkara University</i></li></ul>
+    </div>
+    <div class="sidebox rv">
+      <h3>Certifications</h3>
+      <ul>
+        <li><b>AI-First Product Management Launchpad</b><i>Airtribe</i></li>
+        <li><b>Product Analytics</b><i>The Product School</i></li>
+        <li><b>JIRA</b><i>Udemy</i></li>
+      </ul>
+    </div>
+    <div class="sidebox rv">
+      <h3>Languages</h3>
+      <ul>
+        <li><b>English · Hindi · Punjabi</b><i>He ships multilingual products —<br>this is a working column, not a hobby line</i></li>
+      </ul>
+    </div>
+  </div>
+  <div class="fine-note rv">
+    <a class="btn" href="{{RESUME_HREF}}" download="Anhad-Resume.pdf">Download the press kit (PDF) ↓</a>
+    <span class="mono" style="color:var(--ink-faint)">One page. All facts checked by the subject, twice.</span>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================== BACK COVER ============================== -->
+<footer class="back" id="back" data-page="§" data-name="Back Cover">
+  <div class="page">
+    <div class="folio"><span><b>The Knowing</b><span class="iss"> · Issue 08</span> · Back cover</span><span>Subscriptions &amp; correspondence</span></div>
+    <h2 class="back-head rv">Subscribe to<br><a href="mailto:anhadsb2@gmail.com?subject=Regarding%20Issue%2009">future issues.</a></h2>
+    <p class="back-sub rv">Issue 09 could be about the product you're hiring for. The subject is a
+      product manager who designs what he specs, based in Punjab, available worldwide, and — see
+      cover — open to work. Correspondence is answered personally, usually between tabs.</p>
+
+    <div class="cards">
+      <a class="card rv" href="mailto:anhadsb2@gmail.com"><b>Correspondence</b><span>anhadsb2@gmail.com</span><i>Replies personally</i></a>
+      <a class="card rv" href="tel:+919115551310"><b>Telephone</b><span>+91 91155 51310</span><i>Punjab hours · flexible</i></a>
+      <a class="card rv" href="https://www.linkedin.com/in/anhad-singh-180925183/" target="_blank" rel="noopener"><b>LinkedIn ↗</b><span>/in/anhad-singh</span><i>The public record</i></a>
+      <a class="card rv presskit" href="{{RESUME_HREF}}" download="Anhad-Resume.pdf"><b>Press kit ↓</b><span>Anhad-Resume.pdf</span><i>One page · facts only</i></a>
+    </div>
+
+    <div class="back-foot">
+      <div class="barcode" aria-hidden="true">
+        <div class="bars" id="bars2"></div>
+        <p class="bc-meta"><b>8 080826 140909</b>still one coffee</p>
+      </div>
+      <p class="back-colophon">The Knowing · Issue 08 · Punjab → Worldwide<br>
+        Set in Boska, Sentient &amp; Fragment Mono · Hand-coded, no libraries<br>
+        Published whenever something worth knowing happens</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================== TEARSHEETS ============================== -->
+<dialog class="tearsheet" id="ts-jaano" aria-labelledby="ts-jaano-t">
+  <div class="ts-tear" aria-hidden="true"></div>
+  <div class="ts-inner">
+    <div class="ts-head"><span>Tearsheet № 1 · From Issue 08 · Confidential-ish</span>
+      <button class="ts-close" type="button" data-close>Close ✕</button></div>
+    <div class="ts-body">
+      <h3 id="ts-jaano-t">Jaano</h3>
+      <p class="ts-role">Product + design owner · RBI-compliant Video KYC + Video PD</p>
+
+      <h4>The discovery</h4>
+      <p>Sat with auditors, underwriters, compliance officers and ops teams before drawing anything.
+        The product's shape came out of those rooms, not out of a whiteboard.</p>
+
+      <h4>Shipped</h4>
+      <ul>
+        <li>Defined, prioritised and shipped <b>three verification models</b>: officer-led, self-serve,
+          and AI avatar-guided.</li>
+        <li>Designed the customer journeys and the <b>admin, agent and auditor consoles</b> — plus the
+          design system they all run on.</li>
+        <li>Defined the reporting suite — <b>1 case report + 8 ops reports</b> — with underwriter
+          input, not in spite of it.</li>
+        <li>Wrote the positioning and the buyer decks that took it to banks, with every claim verified
+          line-by-line against production code.</li>
+      </ul>
+
+      <h4>The product rules</h4>
+      <p class="ts-rule">“AI signals advise, a human decides.”</p>
+      <ul>
+        <li>No customer dead-ends. Ever. Every journey has a way forward.</li>
+        <li>Tenant-configurable checklists, languages and journeys — configurability is the product's
+          lead USP, and that framing is his.</li>
+      </ul>
+
+      <p class="ts-foot">NDA in force: no product screenshots, no client names.
+        <a href="mailto:anhadsb2@gmail.com?subject=Tell%20me%20about%20Jaano">Ask him about it →</a></p>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="tearsheet" id="ts-voicebrew" aria-labelledby="ts-vb-t">
+  <div class="ts-tear" aria-hidden="true"></div>
+  <div class="ts-inner">
+    <div class="ts-head"><span>Tearsheet № 2 · From Issue 08 · Confidential-ish</span>
+      <button class="ts-close" type="button" data-close>Close ✕</button></div>
+    <div class="ts-body">
+      <h3 id="ts-vb-t">VoiceBrew</h3>
+      <p class="ts-role">0-to-1 feature PM + designer · AI voice agents</p>
+
+      <h4>Defined from scratch</h4>
+      <ul>
+        <li><b>Campaign scheduling + outcome-based sequencing</b> — event-gated campaign journeys where
+          the next call waits for what actually happened, not the calendar. Taken from first sketch to
+          build-spec.</li>
+        <li>Internal <b>control-plane spec</b>: telemetry, a metrics catalogue, RBAC, SLOs, and call
+          replay — the unglamorous machinery that makes voice AI operable.</li>
+      </ul>
+
+      <h4>Client workflows, BFSI</h4>
+      <ul>
+        <li>Collections, card activation, welcome + loan outreach — each client's real process turned
+          into call flows and lead schemas a voice agent can execute.</li>
+      </ul>
+
+      <p class="ts-foot">NDA in force: no client names, no recordings.
+        <a href="mailto:anhadsb2@gmail.com?subject=Tell%20me%20about%20VoiceBrew">Ask him about it →</a></p>
+    </div>
+  </div>
+</dialog>
+
+<noscript><style>.rv{opacity:1;transform:none}.pq{transform:none}#pfolio{display:none}</style></noscript>
+
+<script>
+(function(){
+"use strict";
+var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---- favicon (data URI — no external requests, no <link> in source) ---- */
+var fav=document.createElement("link");
+fav.rel="icon";
+fav.href="data:image/svg+xml,"+encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>"+
+  "<rect width='64' height='64' fill='#f4f0e6'/>"+
+  "<rect x='3' y='3' width='58' height='58' fill='none' stroke='#221b12' stroke-width='3'/>"+
+  "<text x='32' y='45' font-family='Georgia,serif' font-style='italic' font-weight='700' font-size='38' text-anchor='middle' fill='#a72b16'>K.</text></svg>");
+document.head.appendChild(fav);
+
+/* ---- barcode: CSS lines ---- */
+function barcode(el){
+  if(!el) return;
+  var pat=[3,1,1,2,1,3,2,1,1,1,3,1,2,1,1,4,1,1,2,1,3,1,1,2,4,1,1,3,1,2,1,1,3,1,2];
+  var html="";
+  for(var i=0;i<pat.length;i++){
+    html+='<i style="width:'+pat[i]+'px"></i><i class="g" style="width:'+((i*7)%3+1)+'px"></i>';
+  }
+  el.innerHTML=html;
+}
+barcode(document.getElementById("bars"));
+barcode(document.getElementById("bars2"));
+
+/* ---- reveals ---- */
+var rvs=[].slice.call(document.querySelectorAll(".rv"));
+if(reduce||!("IntersectionObserver" in window)){
+  rvs.forEach(function(el){el.classList.add("in");});
+}else{
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target);}});
+  },{rootMargin:"0px 0px -8% 0px",threshold:.08});
+  rvs.forEach(function(el){io.observe(el);});
+}
+
+/* ---- pull-quote swell + progress folio ---- */
+var pqs=[].slice.call(document.querySelectorAll(".pq"));
+var pfEl=document.getElementById("pf-page");
+var secs=[].slice.call(document.querySelectorAll("[data-page]"));
+var ticking=false;
+function onScroll(){
+  if(ticking) return; ticking=true;
+  requestAnimationFrame(function(){
+    ticking=false;
+    var vh=innerHeight;
+    if(!reduce){
+      pqs.forEach(function(q){
+        var r=q.getBoundingClientRect();
+        var c=r.top+r.height/2, d=Math.abs(c-vh/2);
+        var t=Math.max(0,Math.min(1,1-d/(vh*.85)));
+        q.style.setProperty("--sw",t.toFixed(3));
+      });
+    }
+    /* progress folio */
+    var label="COVER", probe=vh*.45;
+    for(var i=0;i<secs.length;i++){
+      var r2=secs[i].getBoundingClientRect();
+      if(r2.top<=probe){
+        label = secs[i].dataset.page==="§" ? "BACK COVER"
+              : "PAGE "+secs[i].dataset.page+" · "+secs[i].dataset.name.toUpperCase();
+      }
+    }
+    if(pfEl.textContent!==label) pfEl.textContent=label;
+  });
+}
+addEventListener("scroll",onScroll,{passive:true});
+addEventListener("resize",onScroll);
+onScroll();
+
+/* ---- smooth in-page scroll (JS so screenshots and reduced motion stay honest) ---- */
+[].slice.call(document.querySelectorAll('a[href^="#"]')).forEach(function(a){
+  a.addEventListener("click",function(e){
+    var t=document.getElementById(a.getAttribute("href").slice(1));
+    if(!t) return;
+    e.preventDefault();
+    t.scrollIntoView(reduce?{block:"start"}:{behavior:"smooth",block:"start"});
+    history.replaceState(null,"","#"+t.id);
+  });
+});
+
+/* ---- tearsheet dialogs ---- */
+var opener=null;
+[].slice.call(document.querySelectorAll("[data-open]")).forEach(function(btn){
+  btn.addEventListener("click",function(){
+    var d=document.getElementById(btn.getAttribute("data-open"));
+    if(!d) return;
+    opener=btn;
+    d.showModal();
+    d.querySelector(".ts-inner").scrollTop=0;
+  });
+});
+[].slice.call(document.querySelectorAll("dialog.tearsheet")).forEach(function(d){
+  d.querySelector("[data-close]").addEventListener("click",function(){ d.close(); });
+  d.addEventListener("click",function(e){ if(e.target===d) d.close(); });
+  d.addEventListener("close",function(){ if(opener){opener.focus();opener=null;} });
+});
+})();
+</script>
