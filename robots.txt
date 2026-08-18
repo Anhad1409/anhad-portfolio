@@ -1,0 +1,17 @@
+# The portfolio is the root page. The alternate concepts and the gallery are
+# working files kept for reference — reachable, but not what search should show.
+User-agent: *
+Allow: /$
+Allow: /index.html
+Allow: /og.png
+Disallow: /v1.html
+Disallow: /v2.html
+Disallow: /v3.html
+Disallow: /v4.html
+Disallow: /v5.html
+Disallow: /versions.html
+Disallow: /hub.html
+Disallow: /src.html
+Disallow: /srcs/
+
+Sitemap: https://anhad1409.github.io/anhad-portfolio/sitemap.xml
